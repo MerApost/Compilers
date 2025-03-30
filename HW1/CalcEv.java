@@ -50,27 +50,31 @@ public class CalcEv {
         return value;
     }
 
+    //Exp -> Term Exp2
     private int Exp() throws IOException, ParseError {
-        if (isDigit(lookahead)) {
-            int cond = evalDigit(lookahead);
+        // if (isDigit(lookahead)) {
+        //     int cond = evalDigit(lookahead);
 
-            consume(lookahead);
-            return Exp2(cond); 
-        }
+        //     consume(lookahead);
+        //     return Exp2(cond); 
+        // }
 
-        throw new ParseError();
+        // throw new ParseError();
+        int left = Term();
+        return Exp2(left);
     }
 
+    //Exp2 -> (+ Term Exp2) | (-Term Exp2) | ε
     private int Exp2(int condition) throws IOException, ParseError {
         switch (lookahead) {
             case '+':
                 consume('+');
-                int right = Exp();
-                return condition + right;
+                //int right = Exp();
+                return Exp2(condition + Term());
             case '-':
                 consume('-');
-                right = Exp();
-                return condition - right;
+                //right = Exp();
+                return Exp2( condition - Term());
             // case '*':
             //     consume('*');
             //     if ( lookahead == '*'){
@@ -88,32 +92,38 @@ public class CalcEv {
         throw new ParseError();
     }
 
+    //Term -> Factor Term2
     private int Term() throws IOException, ParseError {
-        if (isDigit(lookahead)) {
-            int cond = Factor();
+        // if (isDigit(lookahead)) {
+        //     int cond = Factor();
 
-            consume(lookahead);
-            return Term2(cond); 
-        }
+        //     consume(lookahead);
+        //     return Term2(cond); 
+        // }
 
-        throw new ParseError();
+        // throw new ParseError();
+        int condition = Factor();
+        return Term2(condition);
     }
 
-    private int Term2(int left) throws IOException, ParseError {
+    //Term2 -> (** Factor Term2) | ε
+    private int Term2(int condition) throws IOException, ParseError {
         switch (lookahead){
             case '*':
                 consume('*');
                 if (lookahead == '*') {
                     consume('*');
                     int right = Factor();
-                    return Term2((int) Math.pow(left, right));
-                } else {
-                throw new ParseError();
+                    return Term2((int) Math.pow(condition, right));
+                } 
+                else {
+                    throw new ParseError();
             }
         }
-        return left;
+        return condition;
     }
 
+    //Factor -> num | ε
     private int Factor() throws IOException, ParseError {
         switch (lookahead) {
             case '(':
