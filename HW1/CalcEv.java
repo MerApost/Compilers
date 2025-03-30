@@ -1,6 +1,7 @@
 package HW1;
-import java.io.InputStream;
-import java.io.IOException;
+import java.io.*;
+// import java.io.InputStream;
+// import java.io.IOException;
 /*
 * -------------------------------------------------------------------------
 * 	        |     '0' .. '9'     |  ':'    |       '?'          |  $    |
@@ -70,14 +71,14 @@ public class CalcEv {
                 consume('-');
                 right = Exp();
                 return condition - right;
-            case '*':
-                consume('*');
-                if ( lookahead == '*'){
-                    consume('*');
-                    right = Exp();
-                    return (int) Math.pow(condition, right);
-                }
-                throw new ParseError();
+            // case '*':
+            //     consume('*');
+            //     if ( lookahead == '*'){
+            //         consume('*');
+            //         right = Exp();
+            //         return (int) Math.pow(condition, right);
+            //     }
+            //     throw new ParseError();
             case -1:
             case '\n':
             case ')':

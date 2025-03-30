@@ -5,6 +5,7 @@ import java.io.*;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.print("Enter an expression: ");
         try {
             System.out.println((new CalcEv(System.in)).eval());
         } catch (IOException | ParseError e) {
