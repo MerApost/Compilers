@@ -2,6 +2,7 @@ package HW1;
 import java.io.*;
 // import java.io.InputStream;
 // import java.io.IOException;
+
 /*
 * -------------------------------------------------------------------------
 * 	        |     '0' .. '9'     |  ':'    |       '?'          |  $    |
@@ -24,22 +25,31 @@ public class CalcEv {
     public CalcEv(InputStream in) throws IOException {
         this.in = in;
         lookahead = in.read();
+        SkipSpace();
     }
 
     private void consume(int symbol) throws IOException, ParseError {
-        if (lookahead == symbol)
+        if (lookahead == symbol){
             lookahead = in.read();
+            SkipSpace();
+        }
         else
             throw new ParseError();
+    }
+
+    private void SkipSpace() throws IOException {
+        while (lookahead == ' ' || lookahead == '\t') {
+            lookahead = in.read();
+        }
     }
 
     private boolean isDigit(int c) {
         return '0' <= c && c <= '9';
     }
 
-    private int evalDigit(int c) {
-        return c - '0';
-    }
+    // private int evalDigit(int c) {
+    //     return c - '0';
+    // }
 
     public int eval() throws IOException, ParseError {
         int value = Exp();
@@ -52,16 +62,8 @@ public class CalcEv {
 
     //Exp -> Term Exp2
     private int Exp() throws IOException, ParseError {
-        // if (isDigit(lookahead)) {
-        //     int cond = evalDigit(lookahead);
-
-        //     consume(lookahead);
-        //     return Exp2(cond); 
-        // }
-
-        // throw new ParseError();
-        int left = Term();
-        return Exp2(left);
+        int condition = Term();
+        return Exp2(condition);
     }
 
     //Exp2 -> (+ Term Exp2) | (-Term Exp2) | ε
@@ -69,39 +71,21 @@ public class CalcEv {
         switch (lookahead) {
             case '+':
                 consume('+');
-                //int right = Exp();
                 return Exp2(condition + Term());
             case '-':
                 consume('-');
-                //right = Exp();
-                return Exp2( condition - Term());
-            // case '*':
-            //     consume('*');
-            //     if ( lookahead == '*'){
-            //         consume('*');
-            //         right = Exp();
-            //         return (int) Math.pow(condition, right);
-            //     }
-            //     throw new ParseError();
+                return Exp2(condition - Term());
             case -1:
             case '\n':
             case ')':
                 return condition;
         }
 
-        throw new ParseError();
+        return condition;
     }
 
     //Term -> Factor Term2
     private int Term() throws IOException, ParseError {
-        // if (isDigit(lookahead)) {
-        //     int cond = Factor();
-
-        //     consume(lookahead);
-        //     return Term2(cond); 
-        // }
-
-        // throw new ParseError();
         int condition = Factor();
         return Term2(condition);
     }
@@ -113,8 +97,8 @@ public class CalcEv {
                 consume('*');
                 if (lookahead == '*') {
                     consume('*');
-                    int right = Factor();
-                    return Term2((int) Math.pow(condition, right));
+                    int right = Term2(Factor());
+                    return (int) Math.pow(condition, right);
                 } 
                 else {
                     throw new ParseError();
@@ -133,11 +117,19 @@ public class CalcEv {
                 return result;
             default:
                 if (isDigit(lookahead)) {
-                    int num = evalDigit(lookahead);
-                    consume(lookahead);
-                    return num;
+                    return Number();
                 }
                 throw new ParseError();
         }
+    }
+
+    private int Number() throws IOException {
+        int num = 0;
+        while (isDigit(lookahead)) {
+            num = num * 10 + (lookahead - '0');
+            lookahead = in.read();
+        }
+        SkipSpace(); // Αγνοεί τυχόν κενά μετά τον αριθμό
+        return num;
     }
 }
