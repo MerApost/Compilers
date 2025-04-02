@@ -19,8 +19,6 @@ import java.io.*;
 * --------------------------------------------------------------------------------------------------------|
 *  Num   | digit num2    | error       | error       | error         | error  | error           |  error  |
 * --------------------------------------------------------------------------------------------------------|
-*  Num2  | digit num2    |   e         |   e         |   e           |   e    |   e             |    e    |
-* --------------------------------------------------------------------------------------------------------|
 *  Digit | 0-9           | error       | error       | error         | error  | error           |  error  |
 * --------------------------------------------------------------------------------------------------------|
 */
@@ -33,11 +31,11 @@ public class CalcEv {
 
     public CalcEv(InputStream in) throws IOException {
         this.in = in;
-        lookahead = in.read();
+        lookahead = in.read(); // diavasma 1ou xaraktira
         SkipSpace();
     }
 
-    private void consume(int symbol) throws IOException, ParseError {
+    private void consume(int symbol) throws IOException, ParseError { //pairnoume ton xaraktira poy 8eloyme, allios parseerror
         if (lookahead == symbol){
             lookahead = in.read();
             SkipSpace();
@@ -46,13 +44,7 @@ public class CalcEv {
             throw new ParseError();
     }
 
-    private void SkipSpace() throws IOException {
-        while (lookahead == ' ' || lookahead == '\t') {
-            lookahead = in.read();
-        }
-    }
-
-    private boolean isDigit(int c) {
+    private boolean isDigit(int c) { //elegxoume an o xaraktiras einai psifio
         return '0' <= c && c <= '9';
     }
 
@@ -63,7 +55,7 @@ public class CalcEv {
     public int eval() throws IOException, ParseError {
         int value = Exp();
 
-        if (lookahead != -1 && lookahead != '\n')
+        if (lookahead != -1 && lookahead != '\n') //elegxos an yparxoun xaraktires poy den diavase
             throw new ParseError();
 
         return value;
@@ -71,8 +63,8 @@ public class CalcEv {
 
     //Exp -> Term Exp2
     private int Exp() throws IOException, ParseError {
-        int condition = Term();
-        return Exp2(condition);
+        int condition = Term();  //diavazei Term
+        return Exp2(condition);  //kanei + or - meso Expr2
     }
 
     //Exp2 -> (+ Term Exp2) | (-Term Exp2) | ε
@@ -80,23 +72,23 @@ public class CalcEv {
         switch (lookahead) {
             case '+':
                 consume('+');
-                return Exp2(condition + Term());
+                return Exp2(condition + Term());  //kanei thn pros8esh
             case '-':
                 consume('-');
-                return Exp2(condition - Term());
-            case -1:
+                return Exp2(condition - Term());  //kanei thn afairesh
+            case -1:   //se ka8e alli periptosh {-1,),\n}
             case '\n':
             case ')':
-                return condition;
+                return condition; //epistrefei to apotelesma
         }
 
-        return condition;
+        return condition; 
     }
 
     //Term -> Factor Term2
     private int Term() throws IOException, ParseError {
-        int condition = Factor();
-        return Term2(condition);
+        int condition = Factor();  //diavazei Factor
+        return Term2(condition);   //kanei prakseis **
     }
 
     //Term2 -> (** Factor Term2) | ε
@@ -104,11 +96,11 @@ public class CalcEv {
         switch (lookahead){
             case '*':
                 consume('*');
-                if (lookahead == '*') {
+                if (lookahead == '*') {  //prepei na einai **, allios an einai apla * parseerror
                     consume('*');
-                    int right = Term2(Factor());
-                    return (int) Math.pow(condition, right);
-                } 
+                    int condition2 = Term2(Factor());  //giati 8eloume na kanei prajeiw apo deksia
+                    return (int) Math.pow(condition, condition2); //px 2**2**2 =>  2**(2**2)
+                }                                               // h Math.pow(x,y) ypologizei thn dynami(x**y)
                 else {
                     throw new ParseError();
             }
@@ -116,10 +108,10 @@ public class CalcEv {
         return condition;
     }
 
-    //Factor -> num | ε
+    //Factor -> num | (Exp)
     private int Factor() throws IOException, ParseError {
         switch (lookahead) {
-            case '(':
+            case '(':    //diavazei Exp entos paren8eseon
                 consume('(');
                 int result = Exp();
                 consume(')');
@@ -132,13 +124,20 @@ public class CalcEv {
         }
     }
 
+    //diavasma ari8mou (me polla psifia)
     private int Number() throws IOException {
         int num = 0;
         while (isDigit(lookahead)) {
-            num = num * 10 + (lookahead - '0');
+            num = num * 10 + (lookahead - '0');   //kanei to string => ari8mo
             lookahead = in.read();
         }
-        SkipSpace(); // Αγνοεί τυχόν κενά μετά τον αριθμό
+        SkipSpace();
         return num;
+    }
+
+    private void SkipSpace() throws IOException { //prospername ta kena
+        while (lookahead == ' ' || lookahead == '\t') {
+            lookahead = in.read();
+        }
     }
 }
