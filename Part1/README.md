@@ -14,6 +14,5 @@ ________________________________________________________________________________
 | Term2  | error       | e             | e             | error         | e     | ** Factor Term2   | e      |
 | Factor | num         | error         | error         | ( Exp )       | error | error             | error  |
 | Num    | digit num2  | error         | error         | error         | error | error             | error  |
-| Num2   | digit num2  | e             | e             | e             | e     | e                 | e      |
 | Digit  | 0-9         | error         | error         | error         | error | error             | error  |
 |___________________________________________________________________________________________________________|
