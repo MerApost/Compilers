@@ -7,9 +7,9 @@
 public interface sym {
   /* terminals */
   public static final int LBRACE = 5;
-  public static final int NUMBER = 15;
   public static final int SEMI = 14;
   public static final int EQUAL = 13;
+  public static final int STRING = 15;
   public static final int PREFIX = 8;
   public static final int EOF = 0;
   public static final int PLUS = 2;
@@ -39,7 +39,7 @@ public interface sym {
   "ELSE",
   "EQUAL",
   "SEMI",
-  "NUMBER",
+  "STRING",
   "ID"
   };
 }

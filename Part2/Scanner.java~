@@ -704,7 +704,7 @@ class Scanner implements java_cup.runtime.Scanner {
             // fall through
           case 28: break;
           case 12: 
-            { return symbol(sym.NUMBER, yytext().substring(1, yytext().length()-1));
+            { return symbol(sym.STRING, yytext().substring(1, yytext().length()-1));
             } 
             // fall through
           case 29: break;

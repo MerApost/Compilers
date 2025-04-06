@@ -85,8 +85,8 @@ string_lit  =  \"(\\.|[^\"\\\\])*\"
 }
 
 {grammar}    { return symbol(sym.ID, yytext()); }
-/* {string_lit} { return symbol(sym.NUMBER, yytext()); }*/
-{string_lit}   { return symbol(sym.NUMBER, yytext().substring(1, yytext().length()-1)); }
+/* {string_lit} { return symbol(sym.STRING, yytext()); }*/
+{string_lit}   { return symbol(sym.STRING, yytext().substring(1, yytext().length()-1)); }
 
 {WhiteSpace} { /* just skip what was found, do nothing */ }
 
