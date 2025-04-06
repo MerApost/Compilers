@@ -1,0 +1,61 @@
+/* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
+/**
+ *  Package and Import Specifications
+ */
+import java_cup.runtime.*;
+
+/**
+ *  Usercode Components
+
+ */
+parser code {:
+    // Connect this parser to a scanner!
+    Scanner s;
+    Parser(Scanner s){ this.s=s; }
+:}
+
+/* define how to connect to the scanner! */
+scan with {: return s.next_token(); :};
+
+/**
+ *  Symbol Lists
+ */
+
+/* Terminals (tokens returned by the scanner). */
+terminal           PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, PREFIX, SUFFIX, REVERSE, IF, ELSE, EQUAL, SEMI;
+terminal String    NUMBER, ID;        // our scanner provides numbers as integers
+
+/*  Non terminals */
+non terminal           expr_list;
+non terminal String    expr, args;      // used to store evaluated subexpressions
+
+/**
+ *  Precedence Declarations
+ */
+precedence left PLUS;
+precedence left LPAREN;
+precedence left EQUAL;
+precedence left PREFIX, SUFFIX;
+precedence right REVERSE;
+/**
+ *  The Grammar Rules
+ */
+expr_list ::= expr_list expr:e         {: System.out.println(e);:}
+            | expr:e                   {: System.out.println(e);:}
+;
+expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1 + "+" + e2;       :}
+             | LPAREN expr:e RPAREN	        {: RESULT = e;           :}
+             | NUMBER:n	                    {: RESULT = n;           :}
+             | IF expr:c expr:t ELSE expr:e {: RESULT = "if (" + c + ") " + t + " else " + e; :}
+             | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + " = " + e2; :}
+             | REVERSE expr:e               {: RESULT = "reverse " + e; :}
+             | expr:e1 PREFIX expr:e2       {: RESULT = e1 + " prefix " + e2; :}
+             | expr:e1 SUFFIX expr:e2       {: RESULT = e1 + " suffix " + e2; :}
+             | ID:i                         {: RESULT = i; :}
+             | ID:i LPAREN args:a RPAREN    {: RESULT = i + "(" + a + ")"; :}
+             | ID:i LPAREN RPAREN    {: RESULT = i + "(" + ")"; :}
+             ;
+             
+args      ::= expr:e COMMA args:rest        {: RESULT = e + "," + rest; :}
+            | expr:e                        {: RESULT = e; :}
+            ;
