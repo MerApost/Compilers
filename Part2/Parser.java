@@ -468,7 +468,7 @@ class CUP$Parser$actions {
 		int eleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		String e = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 RESULT = "if (" + c + "){ \n" + t + "\n}\n  else {\n" + e+"\n}"; 
+		 RESULT = "if (" + c + "){ \n\t" + t + "\n}\n  else {\n\t" + e+"\n}"; 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("if_case",4, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-4)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
