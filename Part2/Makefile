@@ -6,7 +6,7 @@ compile:
 	javac -cp java-cup-11b-runtime.jar *.java
 
 execute:
-	java -cp java-cup-11b-runtime.jar:. Main < input.txt > input.ir
+	java -cp java-cup-11b-runtime.jar:. Main < input.txt > Translated.ir
 
 clean:
-	rm -f *.class *~ Parser.java Scanner.java sym.java input.ir
+	rm -f *.class *~ Parser.java Scanner.java sym.java Translated.ir

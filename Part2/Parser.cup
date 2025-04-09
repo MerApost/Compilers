@@ -50,7 +50,7 @@ expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1 + " + " + e2;      :}
              | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + " = " + e2;      :}
              | REVERSE expr:e               {: RESULT = "reverse " + e;       :}
              | expr:e1 PREFIX expr:e2       {: RESULT = e1 + " prefix " + e2; :}
-             | expr:e1 SUFFIX expr:e2       {: RESULT = "reverse " + e1 + " prefix reverse " + e2; :}
+             | expr:e1 SUFFIX expr:e2       {: RESULT = e1 + " suffix " + e2; :}
              | ID:i                         {: RESULT = i;                    :}
              | f_call:fc                    {: RESULT = fc;                   :}
              | f_def:fd                     {: RESULT = fd;                   :}
