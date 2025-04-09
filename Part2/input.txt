@@ -1,15 +1,17 @@
-name()  {
+name() {
   "John"
 }
-    
-surname() {
-  "Doe"
-}
-    
-fullname(first_name, sep, last_name) {
-  first_name + sep + last_name
+
+repeat(x) {
+  x + x
 }
 
-name()
-surname()
-fullname(name(), " ", surname())
+cond_repeat(c, x) {
+  if ("?" suffix c)
+    repeat(x)
+  else
+    x
+}
+
+cond_repeat("yes", name())
+cond_repeat("no?", "Jane")

@@ -2,14 +2,18 @@ name() {
   "John"
 }
 
-surname() {
-  "Doe"
+repeat(x) {
+  x + x
 }
 
-fullname(first_name, sep, last_name) {
-  first_name + sep + last_name
+cond_repeat(c, x) {
+  if (reverse "?" prefix reverse c){ 
+	repeat(x)
+}
+  else {
+	x
+}
 }
 
-name()
-surname()
-fullname(name(), " ", surname())
+cond_repeat("yes", name())
+cond_repeat("no?", "Jane")
