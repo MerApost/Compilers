@@ -266,10 +266,10 @@ class CUP$Parser$actions {
           case 3: // expr ::= text 
             {
               String RESULT =null;
-		int sleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
-		int sright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
-		String s = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 RESULT = "\"" + s + "\"";      
+		int tleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
+		int tright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
+		String t = (String)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
+		 RESULT = t;      
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("expr",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;
