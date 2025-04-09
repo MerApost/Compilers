@@ -27,7 +27,7 @@ terminal String    STRING, ID;        // our scanner provides numbers as integer
 
 /*  Non terminals */
 non terminal           expr_list;
-non terminal String    expr, args, str_text, if_case, f_def, f_call;      // used to store evaluated subexpressions
+non terminal String    expr, args, text, if_case, f_def, f_call, act_expr;      // used to store evaluated subexpressions
 
 /**
  *  Precedence Declarations
@@ -43,31 +43,36 @@ precedence right REVERSE;
 expr_list ::= expr_list expr:e         {: System.out.println(e);:}
             | expr:e                   {: System.out.println(e);:}
 ;
-expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1 + " + " + e2;      :}
-             | LPAREN expr:e RPAREN	        {: RESULT = e;                    :}             
-             | STRING:s                     {: RESULT = "\"" + s + "\"";      :}
-             | if_case:f                    {: RESULT = f;                    :}
-             | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + " = " + e2;      :}
-             | REVERSE expr:e               {: RESULT = "reverse " + e;       :}
-             | expr:e1 PREFIX expr:e2       {: RESULT = e1 + " prefix " + e2; :}
-             | expr:e1 SUFFIX expr:e2       {: RESULT = "reverse " + e1 + " prefix reverse " + e2; :}
-             | ID:i                         {: RESULT = i;                    :}
+
+expr      ::= text:s                     {: RESULT = "\"" + s + "\"";      :}
+             | if_case:f                    {: RESULT = f;                    :}           
              | f_call:fc                    {: RESULT = fc;                   :}
              | f_def:fd                     {: RESULT = fd;                   :}
+             | act_expr:a                 {: RESULT = a; :}
+             ;
+
+act_expr   ::= expr:e1 PLUS  expr:e2        {: RESULT = e1 + " + " + e2;      :}
+             | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + " = " + e2;      :}             
+             | REVERSE expr:e               {: RESULT = "reverse " + e;       :} 
+             | expr:e1 PREFIX expr:e2       {: RESULT = e1 + " prefix " + e2; :}
+             | expr:e1 SUFFIX expr:e2       {: RESULT = "reverse " + e1 + " prefix reverse " + e2; :}
              ;
 
 f_call     ::= ID:i LPAREN args:a RPAREN    {: RESULT = i + "(" + a + ")"; :}
              | ID:i LPAREN RPAREN           {: RESULT = i + "(" + ")";     :}
              ;
             
-f_def      ::= ID:i LPAREN RPAREN LBRACE expr:e RBRACE        {: RESULT = i + "() {\n  " + e + "\n}\n";          :}
-             | ID:i LPAREN args:a RPAREN LBRACE expr:e RBRACE {: RESULT = i + "(" + a + ") {\n  " + e + "\n}\n"; :}
+f_def      ::= ID:i LPAREN args:a RPAREN LBRACE expr:e RBRACE {: RESULT = i + "(" + a + ") {\n  " + e + "\n}\n"; :}
+             | ID:i LPAREN RPAREN LBRACE expr:e RBRACE        {: RESULT = i + "() {\n  " + e + "\n}\n";          :}
              ;      
 
-if_case    ::= IF expr:c expr:t ELSE expr:e {: RESULT = "if (" + c + "){ \n\t" + t + "\n}\n  else {\n\t" + e+"\n}"; :};
+if_case    ::= IF expr:c expr:t ELSE expr:e {: RESULT = "if (" + c + "){ \n\t" + t + "\n}\n  else {\n\t" + e +"\n}"; :};
              
 args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
             | expr:e                        {: RESULT = e;               :}
             ;
 
-str_text   ::= STRING:s  {: RESULT = "\"" + s + "\""; :};
+text   ::= STRING:s                  {: RESULT = "\"" + s + "\""; :}
+            | ID:i                   {: RESULT = i;               :}
+            | LPAREN expr:e RPAREN	 {: RESULT = e;               :} 
+            ;
