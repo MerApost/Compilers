@@ -5,6 +5,6 @@
         "jflex-cup/1st-example"
     ],
     "java.project.referencedLibraries": [
-        "jflex-cup/java-cup-11b-runtime.jar"
+        "Part2/java-cup-11b-runtime.jar"
     ]
 }
