@@ -45,11 +45,7 @@ precedence left REVERSE;
 start with begin;
 
 begin      ::=  functions:f expr_list:e {: 
-            System.out.println("public class Translated {\n");
-            System.out.println("  public static void main(String[] args) {\n" + e + "  }\n");
-            System.out.println(f);
-            System.out.println("}");
-          :};
+            System.out.println("public class Translated {\n  public static void main(String[] args) {\n " + e + "\n  }\n\n" + f + "\n}"); :};
 
 functions  ::= functions:f f_def:fd      {: RESULT = f + "\n" + fd + "\n"; :}
                  | f_def:fd              {: RESULT = fd + "\n";            :}
@@ -78,11 +74,11 @@ f_call     ::= ID:i LPAREN args:a RPAREN    {: RESULT = i + "(" + a + ")"; :}
              | ID:i LPAREN RPAREN           {: RESULT = i + "()";          :}
              ;
             
-f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = "public static String " + i + "(" + p + ") {\n  return " + e + ";\n}"; :}
-             | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = "public static String " + i + "() {\n  return " + e + ";\n}";          :}
+f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = " public static String " + i + "(" + p + ") {\n  return " + e + ";\n}"; :}
+             | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = " public static String " + i + "() {\n  return " + e + ";\n }";          :}
              ;
 
-if_case    ::=IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "if (" + c + ") {\n  return " + t + ";\n} else {\n  return " + e + ";\n}"; :};
+if_case    ::=IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "(" + c + "? " + t + " : " + e + ")"; :};
 
 args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
              | expr:e                       {: RESULT = e;               :}

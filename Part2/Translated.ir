@@ -7,10 +7,10 @@ repeat(x) {
 }
 
 cond_repeat(c, x) {
-  if ("?" suffix c)
-    repeat(x)
-  else
-    x
+  if (reverse "?" prefix reverse c) 
+		repeat(x)
+  else 
+		x
 }
 
 cond_repeat("yes", name())

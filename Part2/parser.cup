@@ -77,7 +77,7 @@ f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = i +
              | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = i + "() {\n  " + e + "\n}\n";          :}
              ;      
 
-if_case    ::= IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "if (" + c + "){ \n\t" + t + "\n}\n  else {\n\t" + e +"\n}"; :};
+if_case    ::= IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "if (" + c + ") \n\t\t" +  t + "\n  else \n\t\t" + e; :};
              
 args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
              | expr:e                       {: RESULT = e;               :}
