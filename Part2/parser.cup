@@ -22,7 +22,7 @@ scan with {: return s.next_token(); :};
  */
 
 /* Terminals (tokens returned by the scanner). */
-terminal           PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, PREFIX, SUFFIX, REVERSE, IF, ELSE, EQUAL;
+terminal           PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, PREFIX, SUFFIX, REVERSE, IF, ELSE, EQUAL, LPAREN_LBRACE;
 terminal String    STRING, ID;        // our scanner provides numbers as integers
 
 /*  Non terminals */
@@ -33,6 +33,7 @@ non terminal String    expr, args, text, if_case, f_def, f_call, act_expr, rev_e
  *  Precedence Declarations
  */
 
+precedence left COMMA;
 precedence left PLUS;
 precedence left LPAREN;
 precedence left EQUAL;
@@ -73,7 +74,7 @@ f_call     ::= ID:i LPAREN args:a RPAREN    {: RESULT = i + "(" + a + ")"; :}
              | ID:i LPAREN RPAREN           {: RESULT = i + "(" + ")";     :}
              ;
             
-f_def      ::= ID:i LPAREN params:p RPAREN LBRACE expr:e RBRACE {: RESULT = i + "(" + p + ") {\n  " + e + "\n}\n"; :}
+f_def      ::= ID:i LPAREN params:p LPAREN_LBRACE expr:e RBRACE {: RESULT = i + "(" + p + ") {\n  " + e + "\n}\n"; :}
              | ID:i LPAREN RPAREN LBRACE expr:e RBRACE        {: RESULT = i + "() {\n  " + e + "\n}\n";          :}
              ;      
 

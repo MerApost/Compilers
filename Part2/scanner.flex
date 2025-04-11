@@ -69,6 +69,7 @@ string_lit  =  \"(\\.|[^\"\\\\])*\"
 
 <YYINITIAL> {
 /* operators */
+"(" [ \t\r\n]* "{"    { return symbol(sym.LPAREN_LBRACE); }
  "+"      { return symbol(sym.PLUS); }
  "("      { return symbol(sym.LPAREN); }
  ")"      { return symbol(sym.RPAREN); }
@@ -81,6 +82,7 @@ string_lit  =  \"(\\.|[^\"\\\\])*\"
  "if"       { return symbol(sym.IF); }
  "else"     { return symbol(sym.ELSE); }
  "="        {return symbol(sym.EQUAL); }
+ 
 }
 
 {grammar}    { return symbol(sym.ID, yytext()); }
