@@ -27,16 +27,15 @@ terminal String    STRING, ID;        // our scanner provides numbers as integer
 
 /*  Non terminals */
 non terminal           expr_list, begin, functions;
-non terminal String    expr, args, text, if_case, f_def, f_call, act_expr, rev_expr, params, param;      // used to store evaluated subexpressions
+non terminal String    expr, args, text, if_case, f_def, f_call, act_expr, rev_expr, params, param_id;      // used to store evaluated subexpressions
 
 /**
  *  Precedence Declarations
  */
 
 precedence left COMMA;
-precedence left PLUS;
-precedence left LPAREN;
 precedence left EQUAL;
+precedence left PLUS;
 precedence left PREFIX, SUFFIX;
 precedence left REVERSE;
 /**
@@ -84,11 +83,10 @@ args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
             | expr:e                        {: RESULT = e;               :}
             ;
 
-params     ::= param:p COMMA params:rest    {: RESULT = p + ", " + rest; :}
-             | param:p                {: RESULT = p;               :}
+params     ::= ID:p COMMA params:rest    {: RESULT = p + ", " + rest; :}
+             | ID:p                {: RESULT = p;               :}
             ;
 
-param    ::= ID:i {: RESULT = i; :};
 
 text   ::= STRING:s                  {: RESULT = "\"" + s + "\""; :}
             | ID:i                   {: RESULT = i;               :}
