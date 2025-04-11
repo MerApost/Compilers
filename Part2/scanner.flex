@@ -69,12 +69,12 @@ string_lit  =  \"(\\.|[^\"\\\\])*\"
 
 <YYINITIAL> {
 /* operators */
-"(" [ \t\r\n]* "{"    { return symbol(sym.LPAREN_LBRACE); }
+ ")" [ \t\r\n]* "{"    { return symbol(sym.RPAREN_LBRACE); }
  "+"      { return symbol(sym.PLUS); }
  "("      { return symbol(sym.LPAREN); }
  ")"      { return symbol(sym.RPAREN); }
  "{"        { return symbol(sym.LBRACE); }
- "}"        { return symbol(sym.RBRACE); }
+ "}"        { return symbol(sym.RBRACE); } 
  ","        { return symbol(sym.COMMA); }
  "prefix"   { return symbol(sym.PREFIX); }
  "suffix"   { return symbol(sym.SUFFIX); }

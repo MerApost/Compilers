@@ -7,13 +7,13 @@
 public interface sym {
   /* terminals */
   public static final int LBRACE = 5;
+  public static final int RPAREN_LBRACE = 14;
   public static final int EQUAL = 13;
   public static final int STRING = 15;
   public static final int PREFIX = 8;
   public static final int EOF = 0;
   public static final int PLUS = 2;
   public static final int IF = 11;
-  public static final int LPAREN_LBRACE = 14;
   public static final int ID = 16;
   public static final int ELSE = 12;
   public static final int error = 1;
@@ -38,7 +38,7 @@ public interface sym {
   "IF",
   "ELSE",
   "EQUAL",
-  "LPAREN_LBRACE",
+  "RPAREN_LBRACE",
   "STRING",
   "ID"
   };

@@ -34,7 +34,7 @@ class Scanner implements java_cup.runtime.Scanner {
    */
   private static final String ZZ_CMAP_PACKED = 
     "\11\0\1\3\1\2\1\10\1\11\1\1\22\0\1\3\1\0\1\6"+
-    "\5\0\1\12\1\15\1\0\1\14\1\17\3\0\12\5\3\0\1\32"+
+    "\5\0\1\15\1\12\1\0\1\14\1\17\3\0\12\5\3\0\1\32"+
     "\3\0\32\4\1\0\1\7\2\0\1\4\1\0\4\4\1\22\1\23"+
     "\2\4\1\24\2\4\1\31\3\4\1\20\1\4\1\21\1\26\1\4"+
     "\1\27\1\30\1\4\1\25\2\4\1\13\1\0\1\16\7\0\1\10"+
@@ -664,7 +664,7 @@ class Scanner implements java_cup.runtime.Scanner {
             // fall through
           case 20: break;
           case 4: 
-            { return symbol(sym.LPAREN);
+            { return symbol(sym.RPAREN);
             } 
             // fall through
           case 21: break;
@@ -679,7 +679,7 @@ class Scanner implements java_cup.runtime.Scanner {
             // fall through
           case 23: break;
           case 7: 
-            { return symbol(sym.RPAREN);
+            { return symbol(sym.LPAREN);
             } 
             // fall through
           case 24: break;
@@ -704,7 +704,7 @@ class Scanner implements java_cup.runtime.Scanner {
             // fall through
           case 28: break;
           case 12: 
-            { return symbol(sym.LPAREN_LBRACE);
+            { return symbol(sym.RPAREN_LBRACE);
             } 
             // fall through
           case 29: break;
