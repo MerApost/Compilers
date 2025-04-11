@@ -11,7 +11,7 @@ import java_cup.runtime.*;
 parser code {:
     // Connect this parser to a scanner!
     Scanner s;
-    Parser(Scanner s){ this.s=s; }
+    Parser2(Scanner s){ this.s=s; }
 :}
 
 /* define how to connect to the scanner! */
@@ -42,12 +42,12 @@ precedence left REVERSE;
  *  The Grammar Rules
  */
 
-begin      ::= functions expr_list
-             | expr_list
+begin      ::= functions:fs f_call:fc   {: System.out.println("public class Translated {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(" + fc + ");\n\t}\n\n" + fs + "}"); :}
+             | f_call:fc                {: System.out.println("public class Translated {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(" + fc + ");\n\t}\n}"); :}
              ;
 
-functions  ::= functions f_def:fd     {: System.out.println(fd); :}
-             | f_def:fd               {: System.out.println(fd); :}
+functions  ::= functions:fs f_def:fd     {: RESULT = fs + "\n" + fd; :}
+             | f_def:fd                  {: RESULT = fd; :}
              ;
 
 expr_list  ::= expr_list expr:e         {: System.out.println(e); :}
@@ -63,28 +63,29 @@ expr       ::= text:t                    {: RESULT = t;      :}
 
 act_expr   ::= expr:e1 PLUS  expr:e2        {: RESULT = e1 + " + " + e2;                           :}
              | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + " = " + e2;                           :}    
-             | expr:e1 PREFIX expr:e2       {: RESULT = e1 + " prefix " + e2;                      :}
-             | expr:e1 SUFFIX expr:e2       {: RESULT = "reverse " + e1 + " prefix reverse " + e2; :}
+             | expr:e1 PREFIX expr:e2       {: RESULT = e1 + ".startsWith(" + e2 + ")";                      :}
+             | expr:e1 SUFFIX expr:e2       {: RESULT = e1 + ".endsWith(" + e2 + ")"; :}
              ;
 
-rev_expr   ::= REVERSE expr:e               {: RESULT = "reverse " + e;       :};
+rev_expr   ::= REVERSE expr:e               {: RESULT = "new StringBuilder(" + e + ").reverse().toString()"; :};
 
 f_call     ::= ID:i LPAREN args:a RPAREN    {: RESULT = i + "(" + a + ")"; :}
              | ID:i LPAREN RPAREN           {: RESULT = i + "()";          :}
              ;
             
-f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = i + "(" + p + ") {\n  " + e + "\n}\n"; :}
-             | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = i + "() {\n  " + e + "\n}\n";          :}
+f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = "\tpublic static String " + i + "(" + p + ") {\n\treturn " + e + ";\n}\n"; :}
+             | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = "\tpublic static String " + i + "() {\n\treturn " + e + "\n}\n";          :}
              ;      
 
-if_case    ::= IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "if (" + c + "){ \n\t" + t + "\n}\n  else {\n\t" + e +"\n}"; :};
+if_case    ::= IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "(" + c + ") ? " + t + " : " + e; :}
+             | IF LPAREN REVERSE expr:c RPAREN expr:t ELSE expr:e   {: RESULT = "new StringBuilder(" + c + ").reverse().toString() ? " + t + " : " + e; :};
              
 args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
              | expr:e                       {: RESULT = e;               :}
              ;
 
-params     ::= ID:p COMMA params:rest    {: RESULT = p + ", " + rest; :}
-             | ID:p                      {: RESULT = p;               :}
+params     ::= ID:p COMMA params:rest    {: RESULT = "String " + p + ", " + rest; :}
+             | ID:p                      {: RESULT = "String " + p;               :}
              ;
 
 text       ::= STRING:s                   {: RESULT = "\"" + s + "\""; :}

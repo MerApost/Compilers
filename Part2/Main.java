@@ -7,4 +7,4 @@ class Main {
         Parser p = new Parser(new Scanner(new InputStreamReader(System.in)));
         p.parse();
     }
-}
+}   
