@@ -42,16 +42,16 @@ precedence left REVERSE;
  *  The Grammar Rules
  */
 
-begin      ::= functions:fs f_call:fc   {: System.out.println("public class Translated {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(" + fc + ");\n\t}\n\n" + fs + "}"); :}
-             | f_call:fc                {: System.out.println("public class Translated {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(" + fc + ");\n\t}\n}"); :}
+begin      ::=  functions expr_list
+             | expr_list
              ;
 
-functions  ::= functions:fs f_def:fd     {: RESULT = fs + "\n" + fd; :}
-             | f_def:fd                  {: RESULT = fd; :}
+functions  ::= functions f_def:fd     {: System.out.println(fd); :}
+             | f_def:fd               {: System.out.println(fd); :}
              ;
 
-expr_list  ::= expr_list expr:e         {: System.out.println(e); :}
-             | expr:e                   {: System.out.println(e); :}
+expr_list  ::= expr_list expr:e         {: System.out.println("System.out.println(" + e + ");"); :}
+             | expr:e                   {: System.out.println("System.out.println(" + e + ");"); :}
              ;
 
 expr       ::= text:t                    {: RESULT = t;      :}
@@ -61,10 +61,10 @@ expr       ::= text:t                    {: RESULT = t;      :}
              | rev_expr:r                {: RESULT = r;      :}
              ;
 
-act_expr   ::= expr:e1 PLUS  expr:e2        {: RESULT = e1 + " + " + e2;                           :}
-             | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + " = " + e2;                           :}    
+act_expr   ::= expr:e1 PLUS  expr:e2        {: RESULT = e1 + " + " + e2;                                     :}
+             | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + ".equals(" + e2 + ")";                          :}    
              | expr:e1 PREFIX expr:e2       {: RESULT = e1 + ".startsWith(" + e2 + ")";                      :}
-             | expr:e1 SUFFIX expr:e2       {: RESULT = e1 + ".endsWith(" + e2 + ")"; :}
+             | expr:e1 SUFFIX expr:e2       {: RESULT = "new StringBuilder(" + e1 + ").reverse().toString().startsWith(new StringBuilder(" + e2 + ").reverse().toString())"; :}
              ;
 
 rev_expr   ::= REVERSE expr:e               {: RESULT = "new StringBuilder(" + e + ").reverse().toString()"; :};
@@ -73,13 +73,12 @@ f_call     ::= ID:i LPAREN args:a RPAREN    {: RESULT = i + "(" + a + ")"; :}
              | ID:i LPAREN RPAREN           {: RESULT = i + "()";          :}
              ;
             
-f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = "\tpublic static String " + i + "(" + p + ") {\n\treturn " + e + ";\n}\n"; :}
-             | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = "\tpublic static String " + i + "() {\n\treturn " + e + "\n}\n";          :}
-             ;      
+f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = "public static String " + i + "(" + p + ") {\n  return " + e + ";\n}"; :}
+             | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = "public static String " + i + "() {\n  return " + e + ";\n}";          :}
+             ;
 
-if_case    ::= IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "(" + c + ") ? " + t + " : " + e; :}
-             | IF LPAREN REVERSE expr:c RPAREN expr:t ELSE expr:e   {: RESULT = "new StringBuilder(" + c + ").reverse().toString() ? " + t + " : " + e; :};
-             
+if_case    ::=IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "if (" + c + ") {\n  return " + t + ";\n} else {\n  return " + e + ";\n}"; :};
+
 args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
              | expr:e                       {: RESULT = e;               :}
              ;
