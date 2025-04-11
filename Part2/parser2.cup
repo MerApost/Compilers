@@ -1,0 +1,92 @@
+/* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
+/**
+ *  Package and Import Specifications
+ */
+import java_cup.runtime.*;
+
+/**
+ *  Usercode Components
+
+ */
+parser code {:
+    // Connect this parser to a scanner!
+    Scanner s;
+    Parser(Scanner s){ this.s=s; }
+:}
+
+/* define how to connect to the scanner! */
+scan with {: return s.next_token(); :};
+
+/**
+ *  Symbol Lists
+ */
+
+/* Terminals (tokens returned by the scanner). */
+terminal           PLUS, LPAREN, RPAREN, LBRACE, RBRACE, COMMA, PREFIX, SUFFIX, REVERSE, IF, ELSE, EQUAL, RPAREN_LBRACE;
+terminal String    STRING, ID;        // our scanner provides numbers as integers
+
+/*  Non terminals */
+non terminal           expr_list, begin, functions;
+non terminal String    expr, args, text, if_case, f_def, f_call, act_expr, rev_expr, params;      // used to store evaluated subexpressions
+
+/**
+ *  Precedence Declarations
+ */
+
+precedence left COMMA, IF;
+precedence left EQUAL;
+precedence left PLUS;
+precedence left PREFIX, SUFFIX;
+precedence left REVERSE;
+/**
+ *  The Grammar Rules
+ */
+
+begin      ::= functions expr_list
+             | expr_list
+             ;
+
+functions  ::= functions f_def:fd     {: System.out.println(fd); :}
+             | f_def:fd               {: System.out.println(fd); :}
+             ;
+
+expr_list  ::= expr_list expr:e         {: System.out.println(e); :}
+             | expr:e                   {: System.out.println(e); :}
+             ;
+
+expr       ::= text:t                    {: RESULT = t;      :}
+             | if_case:f                 {: RESULT = f;      :}           
+             | f_call:fc                 {: RESULT = fc;     :}
+             | act_expr:a                {: RESULT = a;      :}
+             | rev_expr:r                {: RESULT = r;      :}
+             ;
+
+act_expr   ::= expr:e1 PLUS  expr:e2        {: RESULT = e1 + " + " + e2;                           :}
+             | expr:e1 EQUAL   expr:e2      {: RESULT = e1 + " = " + e2;                           :}    
+             | expr:e1 PREFIX expr:e2       {: RESULT = e1 + " prefix " + e2;                      :}
+             | expr:e1 SUFFIX expr:e2       {: RESULT = "reverse " + e1 + " prefix reverse " + e2; :}
+             ;
+
+rev_expr   ::= REVERSE expr:e               {: RESULT = "reverse " + e;       :};
+
+f_call     ::= ID:i LPAREN args:a RPAREN    {: RESULT = i + "(" + a + ")"; :}
+             | ID:i LPAREN RPAREN           {: RESULT = i + "()";          :}
+             ;
+            
+f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = i + "(" + p + ") {\n  " + e + "\n}\n"; :}
+             | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = i + "() {\n  " + e + "\n}\n";          :}
+             ;      
+
+if_case    ::= IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "if (" + c + "){ \n\t" + t + "\n}\n  else {\n\t" + e +"\n}"; :};
+             
+args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
+             | expr:e                       {: RESULT = e;               :}
+             ;
+
+params     ::= ID:p COMMA params:rest    {: RESULT = p + ", " + rest; :}
+             | ID:p                      {: RESULT = p;               :}
+             ;
+
+text       ::= STRING:s                   {: RESULT = "\"" + s + "\""; :}
+             | ID:i                       {: RESULT = i;               :}
+             ;
