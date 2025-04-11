@@ -42,16 +42,21 @@ precedence left REVERSE;
  *  The Grammar Rules
  */
 
-begin      ::=  functions expr_list
-             | expr_list
-             ;
+start with begin;
 
-functions  ::= functions f_def:fd     {: System.out.println(fd); :}
-             | f_def:fd               {: System.out.println(fd); :}
-             ;
+begin      ::=  functions:f expr_list:e {: 
+            System.out.println("public class Translated {\n");
+            System.out.println("  public static void main(String[] args) {\n" + e + "  }\n");
+            System.out.println(f);
+            System.out.println("}");
+          :};
 
-expr_list  ::= expr_list expr:e         {: System.out.println("System.out.println(" + e + ");"); :}
-             | expr:e                   {: System.out.println("System.out.println(" + e + ");"); :}
+functions  ::= functions:f f_def:fd      {: RESULT = f + "\n" + fd + "\n"; :}
+                 | f_def:fd              {: RESULT = fd + "\n";            :}
+                 ;
+
+expr_list  ::= expr_list:e1 expr:e2         {: RESULT = e1 + "    System.out.println(" + e2 + ");\n"; :}
+            | expr:e                         {: RESULT = "    System.out.println(" + e + ");\n"; :}
              ;
 
 expr       ::= text:t                    {: RESULT = t;      :}
