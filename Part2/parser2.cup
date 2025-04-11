@@ -44,8 +44,7 @@ precedence left REVERSE;
 
 start with begin;
 
-begin      ::=  functions:f expr_list:e {: 
-            System.out.println("public class Translated {\n  public static void main(String[] args) {\n " + e + "\n  }\n\n" + f + "\n}"); :};
+begin      ::=  functions:f expr_list:e {: System.out.println("public class Translated {\n  public static void main(String[] args) {\n " + e + "\n  }\n\n" + f + "\n}"); :};
 
 functions  ::= functions:f f_def:fd      {: RESULT = f + "\n" + fd + "\n"; :}
                  | f_def:fd              {: RESULT = fd + "\n";            :}
@@ -78,7 +77,7 @@ f_def      ::= ID:i LPAREN params:p RPAREN_LBRACE  expr:e RBRACE {: RESULT = " p
              | ID:i LPAREN RPAREN_LBRACE expr:e RBRACE           {: RESULT = " public static String " + i + "() {\n  return " + e + ";\n }";          :}
              ;
 
-if_case    ::=IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "(" + c + "? " + t + " : " + e + ")"; :};
+if_case    ::=IF LPAREN expr:c RPAREN expr:t ELSE expr:e {: RESULT = "if (" + c + ") {\n    return " + t + ";\n} else {\n    return " + e + ";\n}"; :};
 
 args       ::= expr:e COMMA args:rest       {: RESULT = e + ", " + rest; :}
              | expr:e                       {: RESULT = e;               :}

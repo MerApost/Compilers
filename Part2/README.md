@@ -4,8 +4,10 @@ $ make compile
 $ make execute < input.txt
 
 
-Exo kanei to 1o kommati toy 2ou part,  to 2o kommati (auto tis metatropis se java) den trexei gia ola ta paradeigmata...
+Έχω ολοκληρώσει το πρώτο μέρος του δεύτερου σταδίου (source -> IR). Το δεύτερο μέρος, που αφορά τη μετατροπή από IR σε Java, δεν λειτουργεί ακόμα σωστά για όλα τα παραδείγματα.
+Το κύριο πρόβλημα που έχω εντοπίσει είναι πως πριν από κάθε if_case εμφανίζεται μια περιττή return εντολή, και στο τέλος του αρχείου εμφανίζεται ενα επιπλέον ερωτηματικό (;). Αυτό συμβαίνει επειδή υπάρχει μπλέκεται με τον κανόνα της f_def. Δεν πρόλαβα ακόμα να το διορθώσω, αλλά πέρα από αυτό, θεωρώ πως όλα τα υπόλοιπα παραδείγματα μετατρέπονται σωστά.
 
-xrisimopoio tin "ypouli" lysh poy anaferetai sto piazza prokeimenou na jehorizoun oi diloseis ton synartisevn apo tiw klhseiw toyw. Me ayto ton tropo antimetopisame orismena conflicts pou proekyptan.
+Χρησιμοποιώ την "υπουλη" λύση που έχει αναφερθεί στο Piazza, ώστε να διαχωρίζονται οι δηλώσεις συναρτήσεων από τις κλήσεις τους. Με αυτόν τον τρόπο αντιμετωπίστηκαν ορισμένες συγκρούσεις που προέκυπταν στο αρχικό στάδιο.
 
-Exo dokimasei ta test pou exei sto piazza -kai diafora alla dika mou- kai ta metatrepei ola svsta se IR. (kai kapoia se java) 
+Έχω δοκιμάσει τα παραδείγματα που έχουν αναρτηθεί στο Piazza, καθώς και αρκετά δικά μου, και όλα μετατρέπονται σωστά σε ενδιάμεση αναπαράσταση (IR) και αν εξαιρεσουμε την περιπτωση με το εξτρα return και ; μετατρέπονται σωστά και σε Java.
+
