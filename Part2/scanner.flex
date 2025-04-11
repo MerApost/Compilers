@@ -81,7 +81,6 @@ string_lit  =  \"(\\.|[^\"\\\\])*\"
  "if"       { return symbol(sym.IF); }
  "else"     { return symbol(sym.ELSE); }
  "="        {return symbol(sym.EQUAL); }
- ";"        { return symbol(sym.SEMI); }
 }
 
 {grammar}    { return symbol(sym.ID, yytext()); }
