@@ -1,3 +1,4 @@
+package Compilers2.minijava_example;
 import syntaxtree.*;
 import visitor.*;
 
