@@ -1,5 +1,3 @@
-package Compilers2.minijava_example;
-
 class Example {
     public static void main(String[] args) {
     }

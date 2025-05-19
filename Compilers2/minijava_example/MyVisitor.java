@@ -202,4 +202,32 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     public String visit(Identifier n, Void argu) {
         return n.f0.toString();
     }
+
+    /**
+     * f0 -> "{"
+     * f1 -> ( Statement() )*
+     * f2 -> "}"
+     */
+    @Override
+    public String visit(Block n, Void argu) throws Exception {
+        System.out.println("Block:");
+        for (Node node : n.f1.nodes) {
+            node.accept(this, argu);
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
