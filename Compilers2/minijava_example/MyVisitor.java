@@ -1,3 +1,5 @@
+import org.w3c.dom.Node;
+
 import syntaxtree.*;
 import visitor.*;
 
@@ -228,6 +230,24 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         String var = n.f0.accept(this, argu);
         String expr = n.f2.accept(this, argu);
         System.out.println("Assign: " + var + " = " + expr);
+        return null;
+    }
+
+    /**
+     * f0 -> Identifier()
+     * f1 -> "["
+     * f2 -> Expression()
+     * f3 -> "]"
+     * f4 -> "="
+     * f5 -> Expression()
+     * f6 -> ";"
+     */
+    @Override
+    public String visit(ArrayAssignmentStatement n, Void argu) throws Exception {
+        String arrayName = n.f0.accept(this, argu);
+        String index = n.f2.accept(this, argu);
+        String value = n.f5.accept(this, argu);
+        System.out.println("ArrayAssign: " + arrayName + "[" + index + "] = " + value);
         return null;
     }
 
