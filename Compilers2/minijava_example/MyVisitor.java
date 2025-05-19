@@ -217,6 +217,20 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         return null;
     }
 
+    /**
+     * f0 -> Identifier()
+     * f1 -> "="
+     * f2 -> Expression()
+     * f3 -> ";"
+     */
+    @Override
+    public String visit(AssignmentStatement n, Void argu) throws Exception {
+        String var = n.f0.accept(this, argu);
+        String expr = n.f2.accept(this, argu);
+        System.out.println("Assign: " + var + " = " + expr);
+        return null;
+    }
+
 
 
 
