@@ -1,12 +1,12 @@
-package Compilers2.minijava_example;
 import java.util.*;
 
 public class SymbolTable {
+
     public static class ClassInfo {
         public String name;
         public String parent;
-        public LinkedHashMap<String, String> fields = new LinkedHashMap<>();
-        public LinkedHashMap<String, MethodInfo> methods = new LinkedHashMap<>();
+        public Map<String, String> variables = new LinkedHashMap<>();
+        public Map<String, MethodInfo> methods = new LinkedHashMap<>();
 
         public ClassInfo(String name, String parent) {
             this.name = name;
@@ -16,12 +16,14 @@ public class SymbolTable {
 
     public static class MethodInfo {
         public String returnType;
-        public LinkedHashMap<String, String> arguments = new LinkedHashMap<>();
-        public LinkedHashMap<String, String> localVars = new LinkedHashMap<>();
+        public Map<String, String> parameters = new LinkedHashMap<>();
+        public Map<String, String> localVars = new LinkedHashMap<>();
 
         public MethodInfo(String returnType) {
             this.returnType = returnType;
         }
     }
 
-    public LinkedHashMap<String, ClassInfo> classes = new LinkedHashMap<>();
+   // public Map<String, ClassInfo> classes = new LinkedHashMap<>();
+    
+}

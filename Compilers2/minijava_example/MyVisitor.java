@@ -1,5 +1,3 @@
-import org.w3c.dom.Node;
-
 import syntaxtree.*;
 import visitor.*;
 
