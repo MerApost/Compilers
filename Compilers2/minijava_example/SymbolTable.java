@@ -22,8 +22,28 @@ public class SymbolTable {
         public MethodInfo(String returnType) {
             this.returnType = returnType;
         }
-    }
 
-   // public Map<String, ClassInfo> classes = new LinkedHashMap<>();
+        public boolean addParameter(String name, String type) {
+            if (parameters.containsKey(name)) return false;
+            parameters.put(name, type);
+            return true;
+        }
+
+        public boolean addLocal(String name, String type) {
+            if (localVars.containsKey(name) || parameters.containsKey(name)) return false;
+            localVars.put(name, type);
+            return true;
+        }
+    }
+    
+    // public Map<String, ClassInfo> classes = new LinkedHashMap<>();
+
+    private final Map<String, ClassInfo> classes = new LinkedHashMap<>();
+    
+    public boolean addClass(String className, String parentName) {
+        if (classes.containsKey(className)) return false;
+        classes.put(className, new ClassInfo(className, parentName));
+        return true;
+    }
     
 }
