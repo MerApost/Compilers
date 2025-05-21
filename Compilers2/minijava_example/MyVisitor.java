@@ -1,3 +1,7 @@
+import java.beans.Expression;
+
+import org.w3c.dom.Node;
+
 import syntaxtree.*;
 import visitor.*;
 
@@ -202,6 +206,39 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     public String visit(Identifier n, Void argu) {
         return n.f0.toString();
     }
+    
+    /**
+     * f0 -> "boolean"
+     * f1 -> "["
+     * f2 -> "]"
+     */
+    @Override
+    public String visit(BooleanArrayType n, Void argu) {
+        return "boolean[]";
+    }
+
+    /**
+     * f0 -> "int"
+     * f1 -> "["
+     * f2 -> "]"
+     */
+    @Override
+    public String visit(IntegerArrayType n, Void argu) {
+        return "int[]";
+    }
+
+    /**
+     * f0 -> Block()
+     *       | AssignmentStatement()
+     *       | ArrayAssignmentStatement()
+     *       | IfStatement()
+     *       | WhileStatement()
+     *       | PrintStatement()
+     */
+    @Override
+    public String visit(Statement n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
 
     /**
      * f0 -> "{"
@@ -210,11 +247,14 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(Block n, Void argu) throws Exception {
-        System.out.println("Block:");
-        for (Node node : n.f1.nodes) {
-            node.accept(this, argu);
-        }
-        return null;
+        String _ret = null;
+        n.f0.accept(this, argu);
+        System.out.println("Block start");
+        n.f1.accept(this, argu);
+        System.out.println("Block end");
+        n.f2.accept(this, argu);
+        
+        return _ret;
     }
 
     /**
@@ -225,10 +265,15 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(AssignmentStatement n, Void argu) throws Exception {
-        String var = n.f0.accept(this, argu);
+        String _ret = null;
+        String id = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        
         String expr = n.f2.accept(this, argu);
-        System.out.println("Assign: " + var + " = " + expr);
-        return null;
+        System.out.println("Assignment: " + id + " = " + expr);
+        
+        n.f3.accept(this, argu);
+        return _ret;
     }
 
     /**
@@ -242,11 +287,93 @@ class MyVisitor extends GJDepthFirst<String, Void>{
      */
     @Override
     public String visit(ArrayAssignmentStatement n, Void argu) throws Exception {
-        String arrayName = n.f0.accept(this, argu);
-        String index = n.f2.accept(this, argu);
-        String value = n.f5.accept(this, argu);
-        System.out.println("ArrayAssign: " + arrayName + "[" + index + "] = " + value);
-        return null;
+        String _ret = null;
+        String id = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        
+        String indexExpr = n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+        
+        String valueExpr = n.f5.accept(this, argu);
+        System.out.println("Array Assignment: " + id + "[" + indexExpr + "] = " + valueExpr);
+        
+        n.f6.accept(this, argu);
+        return _ret;
+    }
+
+    /**
+     * f0 -> "if"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     * f5 -> "else"
+     * f6 -> Statement()
+     */
+    @Override
+    public String visit(IfStatement n, Void argu) throws Exception {
+        String _ret = null;
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        
+        String condition = n.f2.accept(this, argu);
+        System.out.println("If condition: " + condition);
+        
+        n.f3.accept(this, argu);
+        System.out.println("If body:");
+        n.f4.accept(this, argu);
+        
+        n.f5.accept(this, argu);
+        System.out.println("Else body:");
+        n.f6.accept(this, argu);
+        
+        return _ret;
+    }
+
+    /**
+     * f0 -> "while"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> Statement()
+     */
+    @Override
+    public String visit(WhileStatement n, Void argu) throws Exception {
+        String _ret = null;
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        
+        String condition = n.f2.accept(this, argu);
+        System.out.println("While condition: " + condition);
+        
+        n.f3.accept(this, argu);
+        System.out.println("While body:");
+        n.f4.accept(this, argu);
+        
+        return _ret;
+    }
+
+    /**
+     * f0 -> "System.out.println"
+     * f1 -> "("
+     * f2 -> Expression()
+     * f3 -> ")"
+     * f4 -> ";"
+     */
+    @Override
+    public String visit(PrintStatement n, Void argu) throws Exception {
+        String _ret = null;
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        
+        String expr = n.f2.accept(this, argu);
+        System.out.println("Print: " + expr);
+        
+        n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+        
+        return _ret;
     }
 
 
