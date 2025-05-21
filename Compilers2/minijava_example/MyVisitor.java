@@ -376,6 +376,148 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         return _ret;
     }
 
+        /**
+     * f0 -> AndExpression()
+     *       | CompareExpression()
+     *       | PlusExpression()
+     *       | MinusExpression()
+     *       | TimesExpression()
+     *       | ArrayLookup()
+     *       | ArrayLength()
+     *       | MessageSend()
+     *       | Clause()
+     */
+    @Override
+    public String visit(Expression n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    /**
+     * f0 -> Clause()
+     * f1 -> "&&"
+     * f2 -> Clause()
+     */
+    @Override
+    public String visit(AndExpression n, Void argu) throws Exception {
+        String leftClause = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        String rightClause = n.f2.accept(this, argu);
+        
+        return leftClause + " && " + rightClause;
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "<"
+     * f2 -> PrimaryExpression()
+     */
+    @Override
+    public String visit(CompareExpression n, Void argu) throws Exception {
+        String leftExpr = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        String rightExpr = n.f2.accept(this, argu);
+        
+        return leftExpr + " < " + rightExpr;
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "+"
+     * f2 -> PrimaryExpression()
+     */
+    @Override
+    public String visit(PlusExpression n, Void argu) throws Exception {
+        String leftExpr = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        String rightExpr = n.f2.accept(this, argu);
+        
+        return leftExpr + " + " + rightExpr;
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "-"
+     * f2 -> PrimaryExpression()
+     */
+    @Override
+    public String visit(MinusExpression n, Void argu) throws Exception {
+        String leftExpr = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        String rightExpr = n.f2.accept(this, argu);
+        
+        return leftExpr + " - " + rightExpr;
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "*"
+     * f2 -> PrimaryExpression()
+     */
+    @Override
+    public String visit(TimesExpression n, Void argu) throws Exception {
+        String leftExpr = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        String rightExpr = n.f2.accept(this, argu);
+        
+        return leftExpr + " * " + rightExpr;
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "["
+     * f2 -> PrimaryExpression()
+     * f3 -> "]"
+     */
+    @Override
+    public String visit(ArrayLookup n, Void argu) throws Exception {
+        String arrayExpr = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        String indexExpr = n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        
+        return arrayExpr + "[" + indexExpr + "]";
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "."
+     * f2 -> "length"
+     */
+    @Override
+    public String visit(ArrayLength n, Void argu) throws Exception {
+        String arrayExpr = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        n.f2.accept(this, argu);
+        
+        return arrayExpr + ".length";
+    }
+
+    /**
+     * f0 -> PrimaryExpression()
+     * f1 -> "."
+     * f2 -> Identifier()
+     * f3 -> "("
+     * f4 -> ( ExpressionList() )?
+     * f5 -> ")"
+     */
+    @Override
+    public String visit(MessageSend n, Void argu) throws Exception {
+        String objectExpr = n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        String methodName = n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        
+        String arguments = n.f4.present() ? n.f4.accept(this, argu) : "";
+        n.f5.accept(this, argu);
+        
+        System.out.println("Method call: " + objectExpr + "." + methodName + "(" + arguments + ")");
+        
+        return objectExpr + "." + methodName + "(" + arguments + ")";
+    }
+
+
+
+
 
 
 
