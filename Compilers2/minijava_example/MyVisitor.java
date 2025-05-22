@@ -598,14 +598,6 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     }
 
     /**
-     * f0 -> <IDENTIFIER>
-     */
-    @Override
-    public String visit(Identifier n, Void argu) {
-        return n.f0.toString();
-    }
-
-    /**
      * f0 -> "this"
      */
     @Override
@@ -705,7 +697,7 @@ class MyVisitor extends GJDepthFirst<String, Void>{
 
 
 
-    
+
 
     /**
      * f0 -> MainClass()
@@ -731,22 +723,4 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     public String visit(TypeDeclaration n, Void argu) throws Exception {
         return n.f0.accept(this, argu);
     }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
