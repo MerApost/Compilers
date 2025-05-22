@@ -1,72 +1,92 @@
 import java.util.*;
 
 public class SymbolTable {
+    private HashMap<String, ClassSymbol> classes = new HashMap<>();
+
+    public void putClass(String name, ClassSymbol classSymbol) {
+        classes.put(name, classSymbol);
+    }
+
+    public ClassSymbol getClass(String name) {
+        return classes.get(name);
+    }
 
     public static class VariableInfo {
+        public String name;
         public String type;
 
-        public VariableInfo(String type) {
+        public VariableInfo(String name, String type) {
+            this.name = name;
             this.type = type;
         }
     }
 
-    public static class MethodInfo {
+    public static class MethodSymbol {
+        public String name;
         public String returnType;
         public LinkedHashMap<String, VariableInfo> parameters = new LinkedHashMap<>();
         public LinkedHashMap<String, VariableInfo> localVars = new LinkedHashMap<>();
+        public ClassSymbol parentClass;
 
-        public MethodInfo(String returnType) {
+        public MethodSymbol(String name, String returnType, ClassSymbol parentClass) {
+            this.name = name;
             this.returnType = returnType;
+            this.parentClass = parentClass;
         }
 
-        public boolean addParameter(String name, String type) {
-            parameters.put(name, new VariableInfo(type));
+        public boolean putParameter(String name, String type) {
+            if (parameters.containsKey(name)) return false;
+            parameters.put(name, new VariableInfo(name, type));
+            return true;
         }
 
-        public boolean addLocal(String name, String type) {
-            localVars.put(name, new VariableInfo(type));
+        public boolean putLocalVar(String name, String type) {
+            if (localVars.containsKey(name)) return false;
+            localVars.put(name, new VariableInfo(name, type));
+            return true;
         }
 
         public VariableInfo getVar(String name) {
             if (localVars.containsKey(name)) return localVars.get(name);
             if (parameters.containsKey(name)) return parameters.get(name);
+            if (parentClass != null) return parentClass.getField(name);
             return null;
         }
     }
-    
-    // public Map<String, ClassInfo> classes = new LinkedHashMap<>();
 
-    private final Map<String, ClassInfo> classes = new LinkedHashMap<>();
+    public static class ClassSymbol {
+        public String name;
+        public ClassSymbol superClass;
+        public LinkedHashMap<String, VariableInfo> fields = new LinkedHashMap<>();
+        public LinkedHashMap<String, MethodSymbol> methods = new LinkedHashMap<>();
 
-    public boolean addClass(String className, String parentName) {
-        if (classes.containsKey(className)) return false;
-        classes.put(className, new ClassInfo(className, parentName));
-        return true;
+        public ClassSymbol(String name, ClassSymbol superClass) {
+            this.name = name;
+            this.superClass = superClass;
+        }
+
+        public boolean putField(String name, String type) {
+            if (fields.containsKey(name)) return false;
+            fields.put(name, new VariableInfo(name, type));
+            return true;
+        }
+
+        public VariableInfo getField(String name) {
+            if (fields.containsKey(name)) return fields.get(name);
+            if (superClass != null) return superClass.getField(name);
+            return null;
+        }
+
+        public boolean putMethod(String name, MethodSymbol method) {
+            if (methods.containsKey(name)) return false;
+            methods.put(name, method);
+            return true;
+        }
+
+        public MethodSymbol getMethod(String name) {
+            if (methods.containsKey(name)) return methods.get(name);
+            if (superClass != null) return superClass.getMethod(name);
+            return null;
+        }
     }
-
-    public boolean addField(String className, String varName, String type) {
-        ClassInfo cls = classes.get(className);
-        if (cls == null || cls.variables.containsKey(varName)) return false;
-        cls.variables.put(varName, type);
-        return true;
-    }
-
-    public boolean addMethod(String className, String methodName, String returnType) {
-        ClassInfo cls = classes.get(className);
-        if (cls == null || cls.methods.containsKey(methodName)) return false;
-        cls.methods.put(methodName, new MethodInfo(returnType));
-        return true;
-    }
-
-    public boolean addParameter(String className, String methodName, String paramName, String type) {
-        MethodInfo method = getMethod(className, methodName);
-        if (method == null) return false;
-        return method.addParameter(paramName, type);
-    }
-
-    private MethodInfo getMethod(String className, String methodName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMethod'");
-    }
-    
 }
