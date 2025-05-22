@@ -1,7 +1,3 @@
-import java.beans.Expression;
-
-import org.w3c.dom.Node;
-
 import syntaxtree.*;
 import visitor.*;
 
@@ -514,6 +510,228 @@ class MyVisitor extends GJDepthFirst<String, Void>{
         
         return objectExpr + "." + methodName + "(" + arguments + ")";
     }
+
+    /**
+     * f0 -> Expression()
+     * f1 -> ExpressionTail()
+     */
+    @Override
+    public String visit(ExpressionList n, Void argu) throws Exception {
+        String expr = n.f0.accept(this, argu);
+        String tail = n.f1.accept(this, argu);
+        
+        return expr + tail;
+    }
+
+    /**
+     * f0 -> ( ExpressionTerm() )*
+     */
+    @Override
+    public String visit(ExpressionTail n, Void argu) throws Exception {
+        String result = "";
+        
+        for (Node node : n.f0.nodes) {
+            result += node.accept(this, argu);
+        }
+        
+        return result;
+    }
+
+    /**
+     * f0 -> ","
+     * f1 -> Expression()
+     */
+    @Override
+    public String visit(ExpressionTerm n, Void argu) throws Exception {
+        n.f0.accept(this, argu);
+        String expr = n.f1.accept(this, argu);
+        
+        return ", " + expr;
+    }
+
+    /**
+     * f0 -> NotExpression()
+     *       | PrimaryExpression()
+     */
+    @Override
+    public String visit(Clause n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    /**
+     * f0 -> IntegerLiteral()
+     *       | TrueLiteral()
+     *       | FalseLiteral()
+     *       | Identifier()
+     *       | ThisExpression()
+     *       | ArrayAllocationExpression()
+     *       | AllocationExpression()
+     *       | BracketExpression()
+     */
+    @Override
+    public String visit(PrimaryExpression n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    /**
+     * f0 -> <INTEGER_LITERAL>
+     */
+    @Override
+    public String visit(IntegerLiteral n, Void argu) throws Exception {
+        return n.f0.toString();
+    }
+
+    /**
+     * f0 -> "true"
+     */
+    @Override
+    public String visit(TrueLiteral n, Void argu) throws Exception {
+        return "true";
+    }
+
+    /**
+     * f0 -> "false"
+     */
+    @Override
+    public String visit(FalseLiteral n, Void argu) throws Exception {
+        return "false";
+    }
+
+    /**
+     * f0 -> <IDENTIFIER>
+     */
+    @Override
+    public String visit(Identifier n, Void argu) {
+        return n.f0.toString();
+    }
+
+    /**
+     * f0 -> "this"
+     */
+    @Override
+    public String visit(ThisExpression n, Void argu) throws Exception {
+        return "this";
+    }
+
+    /**
+     * f0 -> BooleanArrayAllocationExpression()
+     *       | IntegerArrayAllocationExpression()
+     */
+    @Override
+    public String visit(ArrayAllocationExpression n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    /**
+     * f0 -> "new"
+     * f1 -> "boolean"
+     * f2 -> "["
+     * f3 -> Expression()
+     * f4 -> "]"
+     */
+    @Override
+    public String visit(BooleanArrayAllocationExpression n, Void argu) throws Exception {
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        n.f2.accept(this, argu);
+        
+        String sizeExpr = n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+        
+        return "new boolean[" + sizeExpr + "]";
+    }
+
+    /**
+     * f0 -> "new"
+     * f1 -> "int"
+     * f2 -> "["
+     * f3 -> Expression()
+     * f4 -> "]"
+     */
+    @Override
+    public String visit(IntegerArrayAllocationExpression n, Void argu) throws Exception {
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        n.f2.accept(this, argu);
+        
+        String sizeExpr = n.f3.accept(this, argu);
+        n.f4.accept(this, argu);
+        
+        return "new int[" + sizeExpr + "]";
+    }
+
+    /**
+     * f0 -> "new"
+     * f1 -> Identifier()
+     * f2 -> "("
+     * f3 -> ")"
+     */
+    @Override
+    public String visit(AllocationExpression n, Void argu) throws Exception {
+        n.f0.accept(this, argu);
+        String className = n.f1.accept(this, argu);
+        n.f2.accept(this, argu);
+        n.f3.accept(this, argu);
+        
+        return "new " + className + "()";
+    }
+
+    /**
+     * f0 -> "!"
+     * f1 -> Clause()
+     */
+    @Override
+    public String visit(NotExpression n, Void argu) throws Exception {
+        n.f0.accept(this, argu);
+        String clause = n.f1.accept(this, argu);
+        
+        return "!" + clause;
+    }
+
+    /**
+     * f0 -> "("
+     * f1 -> Expression()
+     * f2 -> ")"
+     */
+    @Override
+    public String visit(BracketExpression n, Void argu) throws Exception {
+        n.f0.accept(this, argu);
+        String expr = n.f1.accept(this, argu);
+        n.f2.accept(this, argu);
+        
+        return "(" + expr + ")";
+    }
+
+
+
+
+    
+
+    /**
+     * f0 -> MainClass()
+     * f1 -> ( TypeDeclaration() )*
+     * f2 -> <EOF>
+     */
+    @Override
+    public String visit(Goal n, Void argu) throws Exception {
+        System.out.println("Program start:");
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        n.f2.accept(this, argu);
+        System.out.println("Program end.");
+        
+        return null;
+    }
+
+    /**
+     * f0 -> ClassDeclaration()
+     *       | ClassExtendsDeclaration()
+     */
+    @Override
+    public String visit(TypeDeclaration n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+}
 
 
 
