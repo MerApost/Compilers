@@ -89,4 +89,35 @@ public class SymbolTable {
             return null;
         }
     }
+    
+    public void printSymbolTable() {
+        for (String className : classes.keySet()) {
+            ClassSymbol classSymbol = classes.get(className);
+            System.out.println("Class: " + className);
+            if (classSymbol.superClass != null) {
+                System.out.println("  Extends: " + classSymbol.superClass.name);
+            }
+            System.out.println("  Fields:");
+            for (String field : classSymbol.fields.keySet()) {
+                VariableInfo fieldInfo = classSymbol.fields.get(field);
+                System.out.println("    " + field + ": " + fieldInfo.type);
+            }
+            System.out.println("  Methods:");
+            for (String methodName : classSymbol.methods.keySet()) {
+                MethodSymbol method = classSymbol.methods.get(methodName);
+                System.out.print("    " + methodName + ": "+ method.returnType);
+                System.out.println();
+                System.out.println("    Parameters:");
+                for (String paramName : method.parameters.keySet()) {
+                    VariableInfo paramInfo = method.parameters.get(paramName);
+                    System.out.println("        " + paramName + ": " + paramInfo.type);
+                }
+                System.out.println("    Local Variables:");
+                for (String localVarName : method.localVars.keySet()) {
+                    VariableInfo localVarInfo = method.localVars.get(localVarName);
+                    System.out.println("        " + localVarName + ": " + localVarInfo.type);
+                }
+            }
+        }                                                                                           
+    }
 }

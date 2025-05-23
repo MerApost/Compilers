@@ -124,7 +124,7 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         //String _ret=null;
         String type = n.f0.accept(this, null);
         String var = n.f1.accept(this, null);
-        // System.out.println(var + " " + type);
+        System.out.println("DEBAG VarDecl: " + var + " " + type + "method=" + (currentMethod != null) + ")");
         //super.visit(n, argu);
         if (currentMethod != null) {
             currentMethod.putLocalVar(var, type);
@@ -750,6 +750,10 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
         System.out.println("Program end.");
+
+        // PRINT SYMBOL TABLE
+        symbolTable.printSymbolTable();
+
         
         return null;
     }
