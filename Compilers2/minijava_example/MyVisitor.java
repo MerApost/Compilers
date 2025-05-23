@@ -1,8 +1,17 @@
+import java.beans.Expression;
+
+import org.w3c.dom.Node;
+
 import syntaxtree.*;
 import visitor.*;
 
+public class MyVisitor extends GJDepthFirst<String, Void> {
+    public SymbolTable symbolTable = new SymbolTable();
 
-class MyVisitor extends GJDepthFirst<String, Void>{
+    private SymbolTable.ClassSymbol currentClass = null;
+    private SymbolTable.MethodSymbol currentMethod = null;
+
+// class MyVisitor extends GJDepthFirst<String, Void>{
     /**
      * f0 -> "class"
      * f1 -> Identifier()
@@ -26,11 +35,22 @@ class MyVisitor extends GJDepthFirst<String, Void>{
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
-        System.out.println("Class: " + classname);
+        SymbolTable.ClassSymbol mainClass = new SymbolTable.ClassSymbol(className, null);
+        symbolTable.putClass(className, mainClass);
+        currentClass = mainClass;
+        
+        //System.out.println("Class: " + classname);
+        SymbolTable.MethodSymbol mainMethod = new SymbolTable.MethodSymbol("main", "void", mainClass);
+        mainClass.putMethod("main", mainMethod);
+        currentMethod = mainMethod;
+        mainMethod.putParameter(n.f11.accept(this, null), "String[]");
+        n.f14.accept(this, argu); 
+    
+        //super.visit(n, argu);
 
-        super.visit(n, argu);
-
-        System.out.println();
+        //System.out.println();
+        currentMethod = null;
+        currentClass = null;
 
         return null;
     }
