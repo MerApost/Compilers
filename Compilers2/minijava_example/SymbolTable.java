@@ -105,17 +105,20 @@ public class SymbolTable {
             System.out.println("  Methods:");
             for (String methodName : classSymbol.methods.keySet()) {
                 MethodSymbol method = classSymbol.methods.get(methodName);
-                System.out.print("    " + methodName + ": "+ method.returnType);
-                System.out.println();
-                System.out.println("    Parameters:");
-                for (String paramName : method.parameters.keySet()) {
-                    VariableInfo paramInfo = method.parameters.get(paramName);
-                    System.out.println("        " + paramName + ": " + paramInfo.type);
+                System.out.println("    " + methodName + ": "+ method.returnType);
+                if (!method.parameters.isEmpty()){
+                    System.out.println("    Parameters:");
+                    for (String paramName : method.parameters.keySet()) {
+                        VariableInfo paramInfo = method.parameters.get(paramName);
+                        System.out.println("        " + paramName + ": " + paramInfo.type);
+                    }
                 }
-                System.out.println("    Local Variables:");
-                for (String localVarName : method.localVars.keySet()) {
-                    VariableInfo localVarInfo = method.localVars.get(localVarName);
-                    System.out.println("        " + localVarName + ": " + localVarInfo.type);
+                if (!method.localVars.isEmpty()){
+                    System.out.println("    Local Variables:");
+                    for (String localVarName : method.localVars.keySet()) {
+                        VariableInfo localVarInfo = method.localVars.get(localVarName);
+                        System.out.println("        " + localVarName + ": " + localVarInfo.type);
+                    }
                 }
             }
         }                                                                                           
