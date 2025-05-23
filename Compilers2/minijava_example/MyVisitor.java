@@ -1,7 +1,3 @@
-import java.beans.Expression;
-
-import org.w3c.dom.Node;
-
 import syntaxtree.*;
 import visitor.*;
 
@@ -35,8 +31,8 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
-        SymbolTable.ClassSymbol mainClass = new SymbolTable.ClassSymbol(className, null);
-        symbolTable.putClass(className, mainClass);
+        SymbolTable.ClassSymbol mainClass = new SymbolTable.ClassSymbol(classname, null);
+        symbolTable.putClass(classname, mainClass);
         currentClass = mainClass;
         
         //System.out.println("Class: " + classname);
@@ -65,22 +61,17 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
      */
     @Override
     public String visit(ClassDeclaration n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
-        
-        String classname = n.f1.accept(this, argu);
-        System.out.println("Class: " + classname);
+    String classname = n.f1.accept(this, null);
+    SymbolTable.ClassSymbol classSymbol = new SymbolTable.ClassSymbol(classname, null);
+    symbolTable.putClass(classname, classSymbol);
+    currentClass = classSymbol;
 
-        n.f2.accept(this, argu);
-        System.out.println("Fields: ");
-        n.f3.accept(this, argu);
-        System.out.println("Methods: ");
-        n.f4.accept(this, argu);
-        n.f5.accept(this, argu);
+    n.f3.accept(this, argu); // fields
+    n.f4.accept(this, argu); // methods
 
-        System.out.println();
-
-        return null;
-    }
+    currentClass = null;
+    return null;
+}
 
     /**
      * f0 -> "class"
@@ -94,21 +85,32 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
      */
     @Override
     public String visit(ClassExtendsDeclaration n, Void argu) throws Exception {
-        n.f0.accept(this, argu);
+        //n.f0.accept(this, argu);
 
         String classname = n.f1.accept(this, null);
-        System.out.println("Class: " + classname);
+        String parentName = n.f3.accept(this, null);
+        SymbolTable.ClassSymbol parent = symbolTable.getClass(parentName);
+        if (parent == null) {
+            throw new Exception("Undefined superclass: " + parentName);
+        }
+        //System.out.println("Class: " + classname);
 
-        n.f2.accept(this, argu);
-        n.f3.accept(this, argu);
-        n.f4.accept(this, argu);
-        System.out.println("Fields: ");
+        // n.f2.accept(this, argu);
+        // n.f3.accept(this, argu);
+        // n.f4.accept(this, argu);
+        // System.out.println("Fields: ");
+        // 
+        // System.out.println("Methods: ");
+        // 
+        // n.f7.accept(this, argu);
+
+        // System.out.println();
+        SymbolTable.ClassSymbol classSymbol = new SymbolTable.ClassSymbol(classname, parent);
+        symbolTable.putClass(classname, classSymbol);
+        currentClass = classSymbol;
         n.f5.accept(this, argu);
-        System.out.println("Methods: ");
         n.f6.accept(this, argu);
-        n.f7.accept(this, argu);
-
-        System.out.println();
+        currentClass = null;
 
         return null;
     }
@@ -119,13 +121,18 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
     * f2 -> ";"
     */
    public String visit(VarDeclaration n, Void argu) throws Exception {
-        String _ret=null;
-        String type = n.f0.accept(this, argu);
-        String var = n.f1.accept(this, argu);
-        System.out.println(var + " " + type);
-        super.visit(n, argu);
+        //String _ret=null;
+        String type = n.f0.accept(this, null);
+        String var = n.f1.accept(this, null);
+        // System.out.println(var + " " + type);
+        //super.visit(n, argu);
+        if (currentMethod != null) {
+            currentMethod.putLocalVar(var, type);
+        } else if (currentClass != null) {
+            currentClass.putField(var, type);
+        }
         
-        return _ret;
+        return null;
     }
 
     /**
@@ -145,15 +152,23 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
      */
     @Override
     public String visit(MethodDeclaration n, Void argu) throws Exception {
-        String argumentList = n.f4.present() ? n.f4.accept(this, null) : "";
+        //String argumentList = n.f4.present() ? n.f4.accept(this, null) : "";
 
         String myType = n.f1.accept(this, null);
         String myName = n.f2.accept(this, null);
 
-        System.out.println("Method: " + myType + " " + myName + " (" + argumentList + ")");
-        System.out.println("Local vars:");
+        SymbolTable.MethodSymbol methodSymbol = new SymbolTable.MethodSymbol(myName, myType, currentClass);
+        currentClass.putMethod(myName, methodSymbol);
+        currentMethod = methodSymbol;
+        n.f4.accept(this, null);
+        n.f7.accept(this, null);
 
-        super.visit(n, argu);
+
+        // System.out.println("Method: " + myType + " " + myName + " (" + argumentList + ")");
+        // System.out.println("Local vars:");
+
+        // super.visit(n, argu);
+        currentMethod = null;
         return null;
     }
 
@@ -202,7 +217,11 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
     public String visit(FormalParameter n, Void argu) throws Exception{
         String type = n.f0.accept(this, null);
         String name = n.f1.accept(this, null);
-        return type + " " + name;
+        if (currentMethod != null) {
+            currentMethod.putParameter(name, type);
+        }
+        return null;
+        //return type + " " + name;
     }
 
     @Override
@@ -681,11 +700,11 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
     @Override
     public String visit(AllocationExpression n, Void argu) throws Exception {
         n.f0.accept(this, argu);
-        String className = n.f1.accept(this, argu);
+        String classname = n.f1.accept(this, argu);
         n.f2.accept(this, argu);
         n.f3.accept(this, argu);
         
-        return "new " + className + "()";
+        return "new " + classname + "()";
     }
 
     /**
