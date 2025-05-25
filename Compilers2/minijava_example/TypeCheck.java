@@ -10,6 +10,36 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         this.symbolTable = symbolTable;
     }
 
+    private String getVariableType(String varName) {
+        if (currentMethod != null) {
+            SymbolTable.VariableInfo var = currentMethod.getVar(varName);
+            if (var != null) return var.type;
+        }
+        if (currentClass != null) {
+            SymbolTable.VariableInfo field = currentClass.getField(varName);
+            if (field != null) return field.type;
+        }
+        return null;
+    }
+
+    private boolean isValidClass(String type) {
+        return symbolTable.getClass(type) != null;
+    }
+
+    private boolean isCompatible(String expected, String actual) {
+        if (expected.equals(actual)) return true;
+        if (isValidClass(actual) && isValidClass(expected)) {
+            SymbolTable.ClassSymbol actualClass = symbolTable.getClass(actual);
+            while (actualClass != null) {
+                if (actualClass.name.equals(expected)) return true;
+                actualClass = actualClass.superClass;
+            }
+        }
+        return false;
+    }
+
+///////////////////////////////////////////////////////////
+
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
@@ -69,6 +99,15 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
     public String visit(AssignmentStatement n, Void argu) throws Exception {
         String varName = n.f0.accept(this, argu);
         String exprType = n.f2.accept(this, argu);
+
+        String varType = getVariableType(varName);
+        if (varType == null) {
+            throw new Exception("Type error: Undefined variable " + varName);
+        }
+
+        if (!isCompatible(varType, exprType)) {
+            throw new Exception("Type error: Can't assign " + exprType + " to " + varType);
+        }
 
         return null;
     }
