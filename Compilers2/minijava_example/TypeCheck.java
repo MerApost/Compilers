@@ -1,4 +1,3 @@
-
 import syntaxtree.*;
 import visitor.*;
 
@@ -46,6 +45,23 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         n.f6.accept(this, argu);
 
         currentClass = null;
+        return null;
+    }
+
+    //VarDeclaration
+
+    @Override
+    public String visit(MethodDeclaration n, Void argu) throws Exception {
+        String methodName = n.f2.accept(this, null);
+        currentMethod = currentClass.getMethod(methodName);
+
+        n.f4.accept(this, null); // Parameters
+        n.f7.accept(this, null); // Local variables
+        n.f8.accept(this, null); // Statements
+
+        n.f10.accept(this, null);
+
+        currentMethod = null;
         return null;
     }
 
