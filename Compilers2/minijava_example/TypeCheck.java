@@ -55,13 +55,21 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         String methodName = n.f2.accept(this, null);
         currentMethod = currentClass.getMethod(methodName);
 
-        n.f4.accept(this, null); // Parameters
-        n.f7.accept(this, null); // Local variables
-        n.f8.accept(this, null); // Statements
+        n.f4.accept(this, null);
+        n.f7.accept(this, null);
+        n.f8.accept(this, null);
 
         n.f10.accept(this, null);
 
         currentMethod = null;
+        return null;
+    }
+
+    @Override
+    public String visit(AssignmentStatement n, Void argu) throws Exception {
+        String varName = n.f0.accept(this, argu);
+        String exprType = n.f2.accept(this, argu);
+
         return null;
     }
 
