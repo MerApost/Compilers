@@ -1,6 +1,4 @@
-import Compilers2.minijava_example.syntaxtree.ClassDeclaration;
-import Compilers2.minijava_example.syntaxtree.MainClass;
-import Compilers2.minijava_example.visitor.GJDepthFirst;
+
 import syntaxtree.*;
 import visitor.*;
 
@@ -34,6 +32,18 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
+
+        currentClass = null;
+        return null;
+    }
+
+    @Override
+    public String visit(ClassExtendsDeclaration n, Void argu) throws Exception {
+        String classname = n.f1.accept(this, null);
+        currentClass = symbolTable.getClass(classname);
+
+        n.f5.accept(this, argu);
+        n.f6.accept(this, argu);
 
         currentClass = null;
         return null;
