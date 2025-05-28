@@ -278,5 +278,120 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         return method.returnType;
     }
 
+    @Override
+    public String visit(ExpressionList n, Void argu) throws Exception {
+        String expr = n.f0.accept(this, argu);
+        String tail = n.f1.accept(this, argu);
+        return expr + tail;
+    }
+
+    @Override
+    public String visit(ExpressionTail n, Void argu) throws Exception {
+        String result = "";
+        for (Node node : n.f0.nodes) {
+            result += node.accept(this, argu);
+        }
+        return result;
+    }
+
+    @Override
+    public String visit(ExpressionTerm n, Void argu) throws Exception {
+        String expr = n.f1.accept(this, argu);
+        return ", " + expr;
+    }
+
+    @Override
+    public String visit(Clause n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    public String visit(PrimaryExpression n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    @Override
+    public String visit(IntegerLiteral n, Void argu) throws Exception {
+        return "int";
+    }
+
+    @Override
+    public String visit(TrueLiteral n, Void argu) throws Exception {
+        return "boolean";
+    }
+
+    @Override
+    public String visit(FalseLiteral n, Void argu) throws Exception {
+        return "boolean";
+    }
+
+    @Override
+    public String visit(Identifier n, Void argu) throws Exception {
+        String varName = n.f0.toString();
+        String type = getVariableType(varName);
+        
+
+        if (type == null) {
+            throw new Exception("Type error: Undefined variable " + varName);
+        }
+        return type;
+    }
+
+    @Override
+    public String visit(ThisExpression n, Void argu) throws Exception {
+        if (currentClass == null) {
+            throw new Exception("Type error: 'this' outside of class");
+        }
+        return currentClass.name;
+    }
+
+    @Override
+    public String visit(ArrayAllocationExpression n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    @Override
+    public String visit(BooleanArrayAllocationExpression n, Void argu) throws Exception {
+        String sizeType = n.f3.accept(this, argu);
+        if (!sizeType.equals("int")) {
+            throw new Exception("Type error: Array size must be int, got " + sizeType);
+        }
+        return "boolean[]";
+    }
+
+
+    @Override
+    public String visit(IntegerArrayAllocationExpression n, Void argu) throws Exception {
+        String sizeType = n.f3.accept(this, argu);
+        if (!sizeType.equals("int")) {
+            throw new Exception("Type error: Array size must be int, got " + sizeType);
+        }
+        return "int[]";
+    }
+
+    @Override
+    public String visit(AllocationExpression n, Void argu) throws Exception {
+        String className = n.f1.accept(this, argu);
+        
+        if (!isValidClass(className)) {
+            throw new Exception("Type error: Undefined class " + className);
+        }
+        return className;
+    }
+
+    @Override
+    public String visit(NotExpression n, Void argu) throws Exception {
+        String clauseType = n.f1.accept(this, argu);
+        if (!clauseType.equals("boolean")) {
+            throw new Exception("Type error: ! operator requires boolean operand");
+        }
+
+        return "boolean";
+    }
+
+    @Override
+    public String visit(BracketExpression n, Void argu) throws Exception {
+        return n.f1.accept(this, argu);
+    }
+
     
 }
