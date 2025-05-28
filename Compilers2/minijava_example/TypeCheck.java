@@ -112,5 +112,65 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         return null;
     }
 
+    @Override
+    public String visit(ArrayAssignmentStatement n, Void argu) throws Exception {
+        String varName = n.f0.accept(this, argu);
+        String indexType = n.f2.accept(this, argu);
+        String valueType = n.f5.accept(this, argu);
+
+        String varType = getVariableType(varName);
+        if (varType == null) {
+            throw new Exception("Type error: Undefined variable " + varName);
+        }
+
+        if (!varType.endsWith("[]")) {
+            throw new Exception("Type error: " + varName + " is not an array");
+        }
+
+        if (!indexType.equals("int")) {
+            throw new Exception("Type error: Array index must be int, u got " + indexType);
+        }
+
+        return null;
+    }
+
+    @Override
+    public String visit(IfStatement n, Void argu) throws Exception {
+        String conditionType = n.f2.accept(this, argu);
+        
+        if (!conditionType.equals("boolean")) {
+            throw new Exception("Type error: If condition must be boolean, got " + conditionType);
+        }
+
+        n.f4.accept(this, argu);
+        n.f6.accept(this, argu);
+
+        return null;
+    }
+
+    @Override
+    public String visit(WhileStatement n, Void argu) throws Exception {
+        String conditionType = n.f2.accept(this, argu);
+        
+        if (!conditionType.equals("boolean")) {
+            throw new Exception("Type error: While condition must be boolean, got " + conditionType);
+        }
+
+        n.f4.accept(this, argu);
+
+        return null;
+    }
+
+    @Override
+    public String visit(PrintStatement n, Void argu) throws Exception {
+        String exprType = n.f2.accept(this, argu);
+
+        if (!exprType.equals("int")) {
+            throw new Exception("Type error: System.out.println expects int, got " + exprType);
+        }
+
+        return null;
+    }
+
     
 }
