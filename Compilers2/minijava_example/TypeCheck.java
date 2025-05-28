@@ -1,3 +1,7 @@
+import java.beans.Expression;
+
+import org.w3c.dom.Node;
+
 import syntaxtree.*;
 import visitor.*;
 
@@ -55,6 +59,11 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
     }
 
     @Override
+    public String visit(TypeDeclaration n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    @Override
     public String visit(ClassDeclaration n, Void argu) throws Exception {
         String classname = n.f1.accept(this, null);
         currentClass = symbolTable.getClass(classname);
@@ -78,7 +87,14 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         return null;
     }
 
-    //VarDeclaration
+    @Override
+    public String visit(VarDeclaration n, Void argu) throws Exception {
+        String type = n.f0.accept(this, null);
+        if (!type.equals("int") && !type.equals("boolean") && !type.equals("int[]") && !type.equals("boolean[]") && !isValidClass(type)) {
+            throw new Exception("Type error: Undefined type " + type);
+        }
+        return null;
+    }
 
     @Override
     public String visit(MethodDeclaration n, Void argu) throws Exception {
@@ -92,6 +108,42 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         n.f10.accept(this, null);
 
         currentMethod = null;
+        return null;
+    }
+
+    @Override
+    public String visit(ArrayType n, Void argu) {
+        return "int[]";
+    }
+
+    @Override
+    public String visit(BooleanArrayType n, Void argu) {
+        return "boolean[]";
+    }
+
+    @Override
+    public String visit(IntegerArrayType n, Void argu) {
+        return "int[]";
+    }
+
+    @Override
+    public String visit(BooleanType n, Void argu) {
+        return "boolean";
+    }
+
+    @Override
+    public String visit(IntegerType n, Void argu) {
+        return "int";
+    }
+
+    @Override
+    public String visit(Statement n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
+    }
+
+    @Override
+    public String visit(Block n, Void argu) throws Exception {
+        n.f1.accept(this, argu);
         return null;
     }
 
@@ -170,6 +222,11 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         }
 
         return null;
+    }
+
+    @Override
+    public String visit(Expression n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
     }
 
     @Override
@@ -393,5 +450,14 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         return n.f1.accept(this, argu);
     }
 
-    
+    @Override
+    public String visit(Goal n, Void argu) throws Exception {
+        System.out.println("Starting type checking:");
+        
+        n.f0.accept(this, argu);
+        n.f1.accept(this, argu);
+        
+        System.out.println("Type checking completed successfully!!");
+        return null;
+    }
 }
