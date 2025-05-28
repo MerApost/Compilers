@@ -13,12 +13,19 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
     private String getVariableType(String varName) {
         if (currentMethod != null) {
             SymbolTable.VariableInfo var = currentMethod.getVar(varName);
-            if (var != null) return var.type;
+            if (var != null) {
+                System.out.println("DEBUG: getVariableType " + varName + " in method: " + var.type);
+                return var.type;
+            }
         }
         if (currentClass != null) {
             SymbolTable.VariableInfo field = currentClass.getField(varName);
-            if (field != null) return field.type;
+            if (field != null) {
+                System.out.println("DEBUG: getVariableType " + varName + " in class: " + field.type);
+                return field.type;
+            }
         }
+        System.out.println("DEBUG: getVariableType " + varName + " not found");
         return null;
     }
 
@@ -94,7 +101,7 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(MethodDeclaration n, Void argu) throws Exception {
-        String methodName = n.f2.accept(this, null);
+        String methodName = n.f2.f0.toString();
         currentMethod = currentClass.getMethod(methodName);
 
         n.f4.accept(this, null);
@@ -105,6 +112,11 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
         currentMethod = null;
         return null;
+    }
+
+    @Override
+    public String visit(Type n, Void argu) throws Exception {
+        return n.f0.accept(this, argu);
     }
 
     @Override
@@ -145,14 +157,13 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(AssignmentStatement n, Void argu) throws Exception {
-        String varName = n.f0.accept(this, argu);
+        String varName = n.f0.f0.toString();
         String exprType = n.f2.accept(this, argu);
 
         String varType = getVariableType(varName);
         if (varType == null) {
             throw new Exception("Type error: Undefined variable " + varName);
         }
-
         if (!isCompatible(varType, exprType)) {
             throw new Exception("Type error: Can't assign " + exprType + " to " + varType);
         }
@@ -189,7 +200,6 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         if (!conditionType.equals("boolean")) {
             throw new Exception("Type error: If condition must be boolean, got " + conditionType);
         }
-
         n.f4.accept(this, argu);
         n.f6.accept(this, argu);
 
@@ -253,6 +263,8 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
     public String visit(PlusExpression n, Void argu) throws Exception {
         String leftType = n.f0.accept(this, argu);
         String rightType = n.f2.accept(this, argu);
+
+        System.out.println("DEBUG: + left=" + leftType + ", right=" + rightType); ///
 
         if (!leftType.equals("int") || !rightType.equals("int")) {
             throw new Exception("Type error: + operator requires int operands");
@@ -379,7 +391,24 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(Identifier n, Void argu) throws Exception {
-        return n.f0.toString();
+        String name = n.f0.toString();
+        System.out.println("DEBUG: Processing identifier: " + name);
+
+        if (name.equals("int") || name.equals("boolean")) {
+            System.out.println("DEBUG: " + name + " is a built-in type");
+            return name;
+        }
+        if (isValidClass(name)) {
+            System.out.println("DEBUG: " + name + " is a valid class");
+            return name;
+        }
+        String type = getVariableType(name);
+        if (type == null) {
+            System.out.println("DEBUG: Identifier " + name + " is undefined in current scope.");
+            throw new Exception("Type error: Undefined variable " + name);
+        }
+        System.out.println("DEBUG: " + name + " resolved to type " + type);
+        return type;
     }
 
     @Override
