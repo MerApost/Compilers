@@ -232,5 +232,32 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         return "int";
     }
 
+    @Override
+    public String visit(ArrayLookup n, Void argu) throws Exception {
+        String arrayType = n.f0.accept(this, argu);
+        String indexType = n.f2.accept(this, argu);
+
+        if (!arrayType.endsWith("[]")) {
+            throw new Exception("Type error: Array lookup on non-array type " + arrayType);
+        }
+
+        if (!indexType.equals("int")) {
+            throw new Exception("Type error: Array index must be int, got " + indexType);
+        }
+
+        return "int";
+    }
+
+    @Override
+    public String visit(ArrayLength n, Void argu) throws Exception {
+        String arrayType = n.f0.accept(this, argu);
+
+        if (!arrayType.endsWith("[]")) {
+            throw new Exception("Type error: length on non-array type " + arrayType);
+        }
+        return "int";
+        
+    }
+
     
 }
