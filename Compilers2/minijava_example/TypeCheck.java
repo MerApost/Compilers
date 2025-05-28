@@ -61,7 +61,7 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(ClassDeclaration n, Void argu) throws Exception {
-        String classname = n.f1.accept(this, null);
+        String classname = n.f1.f0.toString();
         currentClass = symbolTable.getClass(classname);
 
         n.f3.accept(this, argu);
@@ -73,7 +73,7 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(ClassExtendsDeclaration n, Void argu) throws Exception {
-        String classname = n.f1.accept(this, null);
+        String classname = n.f1.f0.toString();
         currentClass = symbolTable.getClass(classname);
 
         n.f5.accept(this, argu);
@@ -379,14 +379,7 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(Identifier n, Void argu) throws Exception {
-        String varName = n.f0.toString();
-        String type = getVariableType(varName);
-        
-
-        if (type == null) {
-            throw new Exception("Type error: Undefined variable " + varName);
-        }
-        return type;
+        return n.f0.toString();
     }
 
     @Override
