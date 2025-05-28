@@ -14,16 +14,19 @@ public class SymbolTable {
     public static class VariableInfo {
         public String name;
         public String type;
+        public int offset;
 
         public VariableInfo(String name, String type) {
             this.name = name;
             this.type = type;
+            this.offset = -1;
         }
     }
 
     public static class MethodSymbol {
         public String name;
         public String returnType;
+        public int offset;
         public LinkedHashMap<String, VariableInfo> parameters = new LinkedHashMap<>();
         public LinkedHashMap<String, VariableInfo> localVars = new LinkedHashMap<>();
         public ClassSymbol parentClass;
@@ -32,6 +35,7 @@ public class SymbolTable {
             this.name = name;
             this.returnType = returnType;
             this.parentClass = parentClass;
+            this.offset = -1;
         }
 
         public boolean putParameter(String name, String type) {
