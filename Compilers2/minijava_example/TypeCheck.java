@@ -172,5 +172,65 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         return null;
     }
 
+    @Override
+    public String visit(AndExpression n, Void argu) throws Exception {
+        String leftType = n.f0.accept(this, argu);
+        String rightType = n.f2.accept(this, argu);
+
+        if (!leftType.equals("boolean") || !rightType.equals("boolean")) {
+            throw new Exception("Type error: && operator requires boolean operands");
+        }
+
+        return "boolean";
+    }
+
+    @Override
+    public String visit(CompareExpression n, Void argu) throws Exception {
+        String leftType = n.f0.accept(this, argu);
+        String rightType = n.f2.accept(this, argu);
+
+        if (!leftType.equals("int") || !rightType.equals("int")) {
+            throw new Exception("Type error: < operator requires int operands");
+        }
+
+        return "boolean";
+    }
+
+    @Override
+    public String visit(PlusExpression n, Void argu) throws Exception {
+        String leftType = n.f0.accept(this, argu);
+        String rightType = n.f2.accept(this, argu);
+
+        if (!leftType.equals("int") || !rightType.equals("int")) {
+            throw new Exception("Type error: + operator requires int operands");
+        }
+
+        return "int";
+    }
+
+    @Override
+    public String visit(MinusExpression n, Void argu) throws Exception {
+        String leftType = n.f0.accept(this, argu);
+        String rightType = n.f2.accept(this, argu);
+
+        if (!leftType.equals("int") || !rightType.equals("int")) {
+            throw new Exception("Type error: - operator requires int operands");
+        }
+
+        return "int";
+    }
+
+    @Override
+    public String visit(TimesExpression n, Void argu) throws Exception {
+        String leftType = n.f0.accept(this, argu);
+        String rightType = n.f2.accept(this, argu);
+
+        if (!leftType.equals("int") || !rightType.equals("int")) {
+            throw new Exception("Type error: * operator requires int operands");
+        }
+
+        return "int";
+    }
+
     
 }
