@@ -256,7 +256,26 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
             throw new Exception("Type error: length on non-array type " + arrayType);
         }
         return "int";
-        
+
+    }
+
+    @Override
+    public String visit(MessageSend n, Void argu) throws Exception {
+        String objectType = n.f0.accept(this, argu);
+        String methodName = n.f2.accept(this, argu);
+
+        SymbolTable.ClassSymbol objectClass = symbolTable.getClass(objectType);
+        if (objectClass == null) {
+            throw new Exception("Type error: " + objectType + " is not a valid class");
+        }
+
+        SymbolTable.MethodSymbol method = objectClass.getMethod(methodName);
+        if (method == null) {
+            throw new Exception("Type error: Method " + methodName + " not found in class " + objectType);
+        }
+
+
+        return method.returnType;
     }
 
     
