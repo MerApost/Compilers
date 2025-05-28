@@ -752,7 +752,7 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         System.out.println("Program end.");
 
         // PRINT SYMBOL TABLE
-        symbolTable.printSymbolTable();
+        //symbolTable.printSymbolTable();
 
         
         return null;

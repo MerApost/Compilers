@@ -42,12 +42,12 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(MainClass n, Void argu) throws Exception {
-        String classname = n.f1.accept(this, null);
+        String classname = n.f1.f0.toString();
         currentClass = symbolTable.getClass(classname);
         currentMethod = currentClass.getMethod("main");
 
-        n.f14.accept(this, argu);
-        n.f15.accept(this, argu);
+        n.f14.accept(this, null);
+        n.f15.accept(this, null);
 
         currentMethod = null;
         currentClass = null;

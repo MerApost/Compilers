@@ -23,6 +23,9 @@ public class Main {
 
             MyVisitor eval = new MyVisitor();
             root.accept(eval, null);
+
+            TypeCheck check = new TypeCheck(eval.symbolTable);
+            root.accept(check, null);
         }
         catch(ParseException ex){
             System.out.println(ex.getMessage());
