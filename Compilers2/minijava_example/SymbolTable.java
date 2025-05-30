@@ -39,13 +39,18 @@ public class SymbolTable {
         }
 
         public boolean putParameter(String name, String type) {
-            if (parameters.containsKey(name)) return false;
+            System.out.println("DEBUG: Adding parameter " + name + " of type " + type + " to method " + this.name);
+            if (parameters.containsKey(name))  {
+                throw new RuntimeException("Semantic error: Duplicate parameter " + name + " in method " + this.name);
+            }
             parameters.put(name, new VariableInfo(name, type));
             return true;
         }
 
         public boolean putLocalVar(String name, String type) {
-            if (localVars.containsKey(name)) return false;
+            if (localVars.containsKey(name) || parameters.containsKey(name)) {
+                throw new RuntimeException("Semantic error: Duplicate variable " + name + " in method " + this.name);
+            }
             localVars.put(name, new VariableInfo(name, type));
             return true;
         }
@@ -70,7 +75,9 @@ public class SymbolTable {
         }
 
         public boolean putField(String name, String type) {
-            if (fields.containsKey(name)) return false;
+            if (fields.containsKey(name)) {
+                throw new RuntimeException("Semantic error: Duplicate field " + name + " in class " + this.name);
+            }
             fields.put(name, new VariableInfo(name, type));
             return true;
         }
@@ -82,7 +89,56 @@ public class SymbolTable {
         }
 
         public boolean putMethod(String name, MethodSymbol method) {
-            if (methods.containsKey(name)) return false;
+            System.out.println("DEBUG putMethod: Adding method " + name + " with " + method.parameters.size() + " parameters");
+            ClassSymbol superC = this.superClass;
+            while (superC != null) {
+                MethodSymbol superMethod = superC.methods.get(name);
+                if (superMethod != null) {
+                    // System.out.println("DEBUG: Found method " + name + " in superclass " + superC.name + " with " + superMethod.parameters.size() + " parameters");
+                    
+                    // System.out.println("DEBUG: Comparing signatures:");
+                    // System.out.println("  Super return type: " + superMethod.returnType + ", This return type: " + method.returnType);
+                    // System.out.println("  Super param count: " + superMethod.parameters.size() + ", This param count: " + method.parameters.size());
+            
+
+
+                    if (!superMethod.returnType.equals(method.returnType) || superMethod.parameters.size() != method.parameters.size()) {
+                        System.out.println("DEBUG: Overloading detected for " + name);
+                        throw new RuntimeException("Semantic error: Method " + name + " in class" + this.name + " overloads method in superclass " + superC.name + " (not allowed in MiniJava)");
+                    }
+
+                        //boolean flag = true;
+                        int i = 0;
+                        for (String paramName : superMethod.parameters.keySet()) {
+                            String superType = superMethod.parameters.get(paramName).type;
+                            String thisType = ((VariableInfo) method.parameters.values().toArray()[i]).type;
+                            if (!superType.equals(thisType)) {
+                                 throw new RuntimeException("Semantic error: Method " + name + " in class" + this.name + " overloads method in superclass " + superC.name + " (not allowed in MiniJava)");
+                            }
+                            i++;
+                        }
+                        break;
+                    
+                        // if (flag){
+                        //     System.out.println("DEBUG: Method " + name + " overridden in class " + this.name);
+                        //     break;
+                        // } else {
+                        //     System.out.println("ERROR: Method overloading not allowed. Method " + name + " already exists in superclass " + superC.name);
+                        //     return false;
+                        // }
+                    // }else {
+                    //     System.out.println("ERROR: Method overloading not allowed. Method " + name + " already exists in superclass " + superC.name);
+                    //     return false;
+                    // }
+                }
+                superC = superC.superClass;
+            }
+
+            if (methods.containsKey(name)) {
+                System.out.println("ERROR: Method " + name + " already defined in class " + this.name);
+                throw new RuntimeException("Semantic error: Method '" + name + "' already defined in class '" + this.name + "'");
+            }
+
             methods.put(name, method);
             return true;
         }

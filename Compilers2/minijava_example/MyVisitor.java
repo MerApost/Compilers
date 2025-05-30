@@ -1,3 +1,4 @@
+
 import syntaxtree.*;
 import visitor.*;
 
@@ -6,6 +7,12 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
 
     private SymbolTable.ClassSymbol currentClass = null;
     private SymbolTable.MethodSymbol currentMethod = null;
+
+    private void addFormalParameterToMethod(FormalParameter param, SymbolTable.MethodSymbol methodSymbol) throws Exception {
+        String type = param.f0.accept(this, null);
+        String name = param.f1.accept(this, null);
+        methodSymbol.putParameter(name, type);
+    }
 
 // class MyVisitor extends GJDepthFirst<String, Void>{
     /**
@@ -37,7 +44,9 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         
         //System.out.println("Class: " + classname);
         SymbolTable.MethodSymbol mainMethod = new SymbolTable.MethodSymbol("main", "void", mainClass);
-        mainClass.putMethod("main", mainMethod);
+        if (!mainClass.putMethod("main", mainMethod)) {
+            throw new Exception("Method definition error: Cannot define main method in class " + classname);
+        }
         currentMethod = mainMethod;
         mainMethod.putParameter(n.f11.accept(this, null), "String[]");
         n.f14.accept(this, argu); 
@@ -158,10 +167,24 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         String myName = n.f2.accept(this, null);
 
         SymbolTable.MethodSymbol methodSymbol = new SymbolTable.MethodSymbol(myName, myType, currentClass);
+        System.out.println("DEBUG: Adding method " + myName + " to class " + currentClass.name);
+
+        if (n.f4.present()) {
+            FormalParameterList paramList = (FormalParameterList) n.f4.node;
+            FormalParameter firstParam = paramList.f0;
+            addFormalParameterToMethod(firstParam, methodSymbol);
+            NodeListOptional tailList = paramList.f1.f0;
+            for (int i = 0; i < tailList.size(); i++) {
+                FormalParameterTerm term = (FormalParameterTerm) tailList.elementAt(i);
+                FormalParameter param = term.f1;
+                addFormalParameterToMethod(param, methodSymbol);
+            }
+        }
+
         currentClass.putMethod(myName, methodSymbol);
         currentMethod = methodSymbol;
-        n.f4.accept(this, null);
         n.f7.accept(this, null);
+        n.f8.accept(this, null);
 
 
         // System.out.println("Method: " + myType + " " + myName + " (" + argumentList + ")");
@@ -217,9 +240,6 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
     public String visit(FormalParameter n, Void argu) throws Exception{
         String type = n.f0.accept(this, null);
         String name = n.f1.accept(this, null);
-        if (currentMethod != null) {
-            currentMethod.putParameter(name, type);
-        }
         return null;
         //return type + " " + name;
     }

@@ -33,6 +33,10 @@ public class Main {
         catch(FileNotFoundException ex){
             System.err.println(ex.getMessage());
         }
+        catch(Exception ex){
+            System.err.println(ex.getMessage());
+            System.exit(1);
+        }
         finally{
             try{
                 if(fis != null) fis.close();

@@ -173,7 +173,7 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(ArrayAssignmentStatement n, Void argu) throws Exception {
-        String varName = n.f0.accept(this, argu);
+        String varName = n.f0.f0.toString();
         String indexType = n.f2.accept(this, argu);
         String valueType = n.f5.accept(this, argu);
 
@@ -327,7 +327,7 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
     @Override
     public String visit(MessageSend n, Void argu) throws Exception {
         String objectType = n.f0.accept(this, argu);
-        String methodName = n.f2.accept(this, argu);
+        String methodName = n.f2.f0.toString();
 
         SymbolTable.ClassSymbol objectClass = symbolTable.getClass(objectType);
         if (objectClass == null) {
