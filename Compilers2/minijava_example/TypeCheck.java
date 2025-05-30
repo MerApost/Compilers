@@ -1,3 +1,7 @@
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import syntaxtree.*;
 import visitor.*;
 
@@ -108,7 +112,12 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         n.f7.accept(this, null);
         n.f8.accept(this, null);
 
-        n.f10.accept(this, null);
+        String declaredType = n.f1.accept(this, null);
+        String actualType = n.f10.accept(this, null);
+
+        if (!isCompatible(declaredType, actualType)) {
+            throw new Exception("Type error: Method '" + methodName + "' should return " + declaredType + ", but returns " + actualType);
+        }
 
         currentMethod = null;
         return null;
@@ -337,6 +346,28 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         SymbolTable.MethodSymbol method = objectClass.getMethod(methodName);
         if (method == null) {
             throw new Exception("Type error: Method " + methodName + " not found in class " + objectType);
+        }
+
+        List<String> argTypes = new ArrayList<>();
+        if (n.f4.present()) {
+            String argsStr = n.f4.accept(this, argu);
+            argsStr = argsStr.trim();
+            if (argsStr.startsWith(",")) argsStr = argsStr.substring(1).trim();
+            if (!argsStr.isEmpty()) {
+                for (String t : argsStr.split(",")) {
+                    argTypes.add(t.trim());
+                }
+            }
+        }
+        List<String> paramTypes = new ArrayList<>(method.parameters.values().stream().map(v -> v.type).collect(Collectors.toList()));
+
+        if (argTypes.size() != paramTypes.size()) {
+            throw new Exception("Type error: Method " + methodName + " expects " + paramTypes.size() + " arguments, got " + argTypes.size());
+        }
+        for (int i = 0; i < argTypes.size(); i++) {
+            if (!isCompatible(paramTypes.get(i), argTypes.get(i))) {
+                throw new Exception("Type error: Argument " + (i+1) + " of method " + methodName + " expects " + paramTypes.get(i) + ", got " + argTypes.get(i));
+            }
         }
 
 
