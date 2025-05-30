@@ -5,7 +5,7 @@ public class SymbolTable {
 
     public void putClass(String name, ClassSymbol classSymbol) {
         if (classes.containsKey(name)) {
-            throw new RuntimeException("Semantic error: Duplicate class '" + name + "'");
+            throw new RuntimeException("Semantic error: Duplicate class " + name);
         }
         classes.put(name, classSymbol);
     }
@@ -168,8 +168,6 @@ public class SymbolTable {
                        // System.out.println("DEBUG: Overloading for " + name);
                         throw new RuntimeException("Semantic error: Method " + name + " in class" + this.name + " overloads method in superclass " + superC.name + " (not allowed in MiniJava)");
                     }
-
-                        //boolean flag = true;
                         int i = 0;
                         for (String paramName : superMethod.parameters.keySet()) {
                             String superType = superMethod.parameters.get(paramName).type;
@@ -180,27 +178,14 @@ public class SymbolTable {
                             i++;
                         }
                         break;
-                    
-                        // if (flag){
-                        //     System.out.println("DEBUG: Method " + name + " overridden in class " + this.name);
-                        //     break;
-                        // } else {
-                        //     System.out.println("ERROR: Method overloading not allowed. Method " + name + " already exists in superclass " + superC.name);
-                        //     return false;
-                        // }
-                    // }else {
-                    //     System.out.println("ERROR: Method overloading not allowed. Method " + name + " already exists in superclass " + superC.name);
-                    //     return false;
-                    // }
                 }
                 superC = superC.superClass;
             }
 
             if (methods.containsKey(name)) {
                 System.out.println("ERROR: Method " + name + " already defined in class " + this.name);
-                throw new RuntimeException("Semantic error: Method '" + name + "' already defined in class '" + this.name + "'");
+                throw new RuntimeException("Semantic error: Method " + name + " already defined in class " + this.name);
             }
-
             if( !methods.isEmpty()) {
                 for (MethodSymbol m : methods.values()) {
                     if (m.offset + 8 > lastOffset) {
@@ -208,7 +193,6 @@ public class SymbolTable {
                     }
                 }
             }
-
             method.offset = lastOffset;
             methods.put(name, method);
             return true;
