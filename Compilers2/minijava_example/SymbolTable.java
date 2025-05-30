@@ -4,6 +4,9 @@ public class SymbolTable {
     private HashMap<String, ClassSymbol> classes = new HashMap<>();
 
     public void putClass(String name, ClassSymbol classSymbol) {
+        if (classes.containsKey(name)) {
+            throw new RuntimeException("Semantic error: Duplicate class '" + name + "'");
+        }
         classes.put(name, classSymbol);
     }
 
