@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class SymbolTable {
-    private HashMap<String, ClassSymbol> classes = new HashMap<>();
+    private LinkedHashMap<String, ClassSymbol> classes = new LinkedHashMap<>();
 
     public void putClass(String name, ClassSymbol classSymbol) {
         if (classes.containsKey(name)) {
@@ -42,11 +42,13 @@ public class SymbolTable {
         }
 
         public boolean putParameter(String name, String type) {
-            System.out.println("DEBUG: Adding parameter " + name + " of type " + type + " to method " + this.name);
+            //System.out.println("DEBUG: Adding parameter " + name + " of type " + type + " to method " + this.name);
             if (parameters.containsKey(name))  {
                 throw new RuntimeException("Semantic error: Duplicate parameter " + name + " in method " + this.name);
             }
-            parameters.put(name, new VariableInfo(name, type));
+            VariableInfo param = new VariableInfo(name, type);
+            param.offset = parameters.size();
+            parameters.put(name, param);
             return true;
         }
 
@@ -54,7 +56,9 @@ public class SymbolTable {
             if (localVars.containsKey(name) || parameters.containsKey(name)) {
                 throw new RuntimeException("Semantic error: Duplicate variable " + name + " in method " + this.name);
             }
-            localVars.put(name, new VariableInfo(name, type));
+            VariableInfo localVar = new VariableInfo(name, type);
+            localVar.offset = localVars.size();
+            localVars.put(name, localVar);
             return true;
         }
 
@@ -72,16 +76,78 @@ public class SymbolTable {
         public LinkedHashMap<String, VariableInfo> fields = new LinkedHashMap<>();
         public LinkedHashMap<String, MethodSymbol> methods = new LinkedHashMap<>();
 
+        public int fieldOffset = 0;
+        public int methodOffset = 0;
+
         public ClassSymbol(String name, ClassSymbol superClass) {
             this.name = name;
             this.superClass = superClass;
+
+            if (superClass != null) {
+                this.fieldOffset = getMaxFieldOffset(superClass) + 1;
+                this.methodOffset = getMaxMethodOffset(superClass) + 1;
+            }
+        }
+
+        private int getMaxFieldOffset(ClassSymbol classSymbol) {
+            int maxOffset = -1;
+            for (VariableInfo field : classSymbol.fields.values()) {
+                if (field.offset > maxOffset) {
+                    maxOffset = field.offset;
+                }
+            }
+            if (classSymbol.superClass != null) {
+                int superMaxOffset = getMaxFieldOffset(classSymbol.superClass);
+                if (superMaxOffset > maxOffset) {
+                    maxOffset = superMaxOffset;
+                }
+            }
+            
+            return maxOffset;
+        }
+
+        private int getMaxMethodOffset(ClassSymbol classSymbol) {
+            int maxOffset = -1;
+            for (MethodSymbol method : classSymbol.methods.values()) {
+                if (method.offset > maxOffset) {
+                    maxOffset = method.offset;
+                }
+            }
+            if (classSymbol.superClass != null) {
+                int superMaxOffset = getMaxMethodOffset(classSymbol.superClass);
+                if (superMaxOffset > maxOffset) {
+                    maxOffset = superMaxOffset;
+                }
+            }
+            
+            return maxOffset;
+        }
+
+        private int getFieldSize(String type) {
+            if (type.equals("int")) return 4;
+            else if (type.equals("boolean")) return 1;
+            else return 8;
         }
 
         public boolean putField(String name, String type) {
             if (fields.containsKey(name)) {
                 throw new RuntimeException("Semantic error: Duplicate field " + name + " in class " + this.name);
             }
-            fields.put(name, new VariableInfo(name, type));
+            VariableInfo var = new VariableInfo(name, type);
+            int size;
+            if (type.equals("int")) size = 4;
+            else if (type.equals("boolean")) size = 1;
+            else size = 8;
+            int lastOffset = 0;
+            if (!fields.isEmpty()) {
+                for (VariableInfo f : fields.values()) {
+                    if (f.offset + getFieldSize(f.type) > lastOffset) {
+                        lastOffset = f.offset + getFieldSize(f.type);
+                    }
+                }
+            }
+            var.offset = lastOffset;
+            fields.put(name, var);
             return true;
         }
 
@@ -92,21 +158,14 @@ public class SymbolTable {
         }
 
         public boolean putMethod(String name, MethodSymbol method) {
-            System.out.println("DEBUG putMethod: Adding method " + name + " with " + method.parameters.size() + " parameters");
+            int lastOffset = 0;
+            //System.out.println("DEBUG putMethod: Adding method " + name + " with " + method.parameters.size() + " parameters");
             ClassSymbol superC = this.superClass;
             while (superC != null) {
                 MethodSymbol superMethod = superC.methods.get(name);
                 if (superMethod != null) {
-                    // System.out.println("DEBUG: Found method " + name + " in superclass " + superC.name + " with " + superMethod.parameters.size() + " parameters");
-                    
-                    // System.out.println("DEBUG: Comparing signatures:");
-                    // System.out.println("  Super return type: " + superMethod.returnType + ", This return type: " + method.returnType);
-                    // System.out.println("  Super param count: " + superMethod.parameters.size() + ", This param count: " + method.parameters.size());
-            
-
-
                     if (!superMethod.returnType.equals(method.returnType) || superMethod.parameters.size() != method.parameters.size()) {
-                        System.out.println("DEBUG: Overloading detected for " + name);
+                       // System.out.println("DEBUG: Overloading for " + name);
                         throw new RuntimeException("Semantic error: Method " + name + " in class" + this.name + " overloads method in superclass " + superC.name + " (not allowed in MiniJava)");
                     }
 
@@ -142,6 +201,15 @@ public class SymbolTable {
                 throw new RuntimeException("Semantic error: Method '" + name + "' already defined in class '" + this.name + "'");
             }
 
+            if( !methods.isEmpty()) {
+                for (MethodSymbol m : methods.values()) {
+                    if (m.offset + 8 > lastOffset) {
+                        lastOffset = m.offset + 8;
+                    }
+                }
+            }
+
+            method.offset = lastOffset;
             methods.put(name, method);
             return true;
         }
@@ -154,36 +222,22 @@ public class SymbolTable {
     }
     
     public void printSymbolTable() {
-        for (String className : classes.keySet()) {
-            ClassSymbol classSymbol = classes.get(className);
-            System.out.println("Class: " + className);
-            if (classSymbol.superClass != null) {
-                System.out.println("  Extends: " + classSymbol.superClass.name);
-            }
-            System.out.println("  Fields:");
+        for (String classname : classes.keySet()) {
+            ClassSymbol classSymbol = classes.get(classname);
+             System.out.println("-----------Class " + classname + "-----------");
+            System.out.println("--Variables---");
+            
             for (String field : classSymbol.fields.keySet()) {
                 VariableInfo fieldInfo = classSymbol.fields.get(field);
-                System.out.println("    " + field + ": " + fieldInfo.type);
+                System.out.println(classname + "." + field + " : " + (fieldInfo.offset));
             }
-            System.out.println("  Methods:");
+            System.out.println("---Methods---");
             for (String methodName : classSymbol.methods.keySet()) {
                 MethodSymbol method = classSymbol.methods.get(methodName);
-                System.out.println("    " + methodName + ": "+ method.returnType);
-                if (!method.parameters.isEmpty()){
-                    System.out.println("    Parameters:");
-                    for (String paramName : method.parameters.keySet()) {
-                        VariableInfo paramInfo = method.parameters.get(paramName);
-                        System.out.println("        " + paramName + ": " + paramInfo.type);
-                    }
-                }
-                if (!method.localVars.isEmpty()){
-                    System.out.println("    Local Variables:");
-                    for (String localVarName : method.localVars.keySet()) {
-                        VariableInfo localVarInfo = method.localVars.get(localVarName);
-                        System.out.println("        " + localVarName + ": " + localVarInfo.type);
-                    }
-                }
+                System.out.println(classname + "." + methodName + " : "+ (method.offset));
+                
             }
+            System.out.println();
         }                                                                                           
     }
 }

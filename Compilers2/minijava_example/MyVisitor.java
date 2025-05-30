@@ -75,8 +75,8 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
     symbolTable.putClass(classname, classSymbol);
     currentClass = classSymbol;
 
-    n.f3.accept(this, argu); // fields
-    n.f4.accept(this, argu); // methods
+    n.f3.accept(this, argu);
+    n.f4.accept(this, argu);
 
     currentClass = null;
     return null;
@@ -133,7 +133,7 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         //String _ret=null;
         String type = n.f0.accept(this, null);
         String var = n.f1.accept(this, null);
-        System.out.println("DEBAG VarDecl: " + var + " " + type + "method=" + (currentMethod != null) + ")");
+        //System.out.println("DEBAG VarDecl: " + var + " " + type + "method=" + (currentMethod != null) + ")");
         //super.visit(n, argu);
         if (currentMethod != null) {
             currentMethod.putLocalVar(var, type);
@@ -161,13 +161,12 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
      */
     @Override
     public String visit(MethodDeclaration n, Void argu) throws Exception {
-        //String argumentList = n.f4.present() ? n.f4.accept(this, null) : "";
-
+        
         String myType = n.f1.accept(this, null);
         String myName = n.f2.accept(this, null);
 
         SymbolTable.MethodSymbol methodSymbol = new SymbolTable.MethodSymbol(myName, myType, currentClass);
-        System.out.println("DEBUG: Adding method " + myName + " to class " + currentClass.name);
+        //System.out.println("DEBUG: Adding method " + myName + " to class " + currentClass.name);
 
         if (n.f4.present()) {
             FormalParameterList paramList = (FormalParameterList) n.f4.node;
@@ -186,11 +185,6 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         n.f7.accept(this, null);
         n.f8.accept(this, null);
 
-
-        // System.out.println("Method: " + myType + " " + myName + " (" + argumentList + ")");
-        // System.out.println("Local vars:");
-
-        // super.visit(n, argu);
         currentMethod = null;
         return null;
     }
@@ -304,9 +298,9 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
     public String visit(Block n, Void argu) throws Exception {
         String _ret = null;
         n.f0.accept(this, argu);
-        System.out.println("Block start");
+        //System.out.println("Block start");
         n.f1.accept(this, argu);
-        System.out.println("Block end");
+       // System.out.println("Block end");
         n.f2.accept(this, argu);
         
         return _ret;
@@ -325,7 +319,7 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         n.f1.accept(this, argu);
         
         String expr = n.f2.accept(this, argu);
-        System.out.println("Assignment: " + id + " = " + expr);
+        //System.out.println("Assignment: " + id + " = " + expr);
         
         n.f3.accept(this, argu);
         return _ret;
@@ -351,7 +345,7 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         n.f4.accept(this, argu);
         
         String valueExpr = n.f5.accept(this, argu);
-        System.out.println("Array Assignment: " + id + "[" + indexExpr + "] = " + valueExpr);
+        //System.out.println("Array Assignment: " + id + "[" + indexExpr + "] = " + valueExpr);
         
         n.f6.accept(this, argu);
         return _ret;
@@ -373,14 +367,14 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         n.f1.accept(this, argu);
         
         String condition = n.f2.accept(this, argu);
-        System.out.println("If condition: " + condition);
+        //System.out.println("If condition: " + condition);
         
         n.f3.accept(this, argu);
-        System.out.println("If body:");
+        //System.out.println("If body:");
         n.f4.accept(this, argu);
         
         n.f5.accept(this, argu);
-        System.out.println("Else body:");
+       // System.out.println("Else body:");
         n.f6.accept(this, argu);
         
         return _ret;
@@ -400,10 +394,10 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         n.f1.accept(this, argu);
         
         String condition = n.f2.accept(this, argu);
-        System.out.println("While condition: " + condition);
+        //System.out.println("While condition: " + condition);
         
         n.f3.accept(this, argu);
-        System.out.println("While body:");
+       // System.out.println("While body:");
         n.f4.accept(this, argu);
         
         return _ret;
@@ -423,7 +417,7 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         n.f1.accept(this, argu);
         
         String expr = n.f2.accept(this, argu);
-        System.out.println("Print: " + expr);
+        //System.out.println("Print: " + expr);
         
         n.f3.accept(this, argu);
         n.f4.accept(this, argu);
@@ -565,7 +559,7 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
         String arguments = n.f4.present() ? n.f4.accept(this, argu) : "";
         n.f5.accept(this, argu);
         
-        System.out.println("Method call: " + objectExpr + "." + methodName + "(" + arguments + ")");
+        //System.out.println("Method call: " + objectExpr + "." + methodName + "(" + arguments + ")");
         
         return objectExpr + "." + methodName + "(" + arguments + ")";
     }
@@ -765,14 +759,14 @@ public class MyVisitor extends GJDepthFirst<String, Void> {
      */
     @Override
     public String visit(Goal n, Void argu) throws Exception {
-        System.out.println("Program start:");
+       // System.out.println("Program start:");
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         n.f2.accept(this, argu);
-        System.out.println("Program end.");
+       // System.out.println("Program end.");
 
         // PRINT SYMBOL TABLE
-        //symbolTable.printSymbolTable();
+        symbolTable.printSymbolTable();
 
         
         return null;

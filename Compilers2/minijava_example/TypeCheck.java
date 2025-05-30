@@ -18,18 +18,18 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         if (currentMethod != null) {
             SymbolTable.VariableInfo var = currentMethod.getVar(varName);
             if (var != null) {
-                System.out.println("DEBUG: getVariableType " + varName + " in method: " + var.type);
+                //System.out.println("DEBUG: getVariableType " + varName + " in method: " + var.type);
                 return var.type;
             }
         }
         if (currentClass != null) {
             SymbolTable.VariableInfo field = currentClass.getField(varName);
             if (field != null) {
-                System.out.println("DEBUG: getVariableType " + varName + " in class: " + field.type);
+               // System.out.println("DEBUG: getVariableType " + varName + " in class: " + field.type);
                 return field.type;
             }
         }
-        System.out.println("DEBUG: getVariableType " + varName + " not found");
+       // System.out.println("DEBUG: getVariableType " + varName + " not found");
         return null;
     }
 
@@ -273,7 +273,7 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
         String leftType = n.f0.accept(this, argu);
         String rightType = n.f2.accept(this, argu);
 
-        System.out.println("DEBUG: + left=" + leftType + ", right=" + rightType); ///
+        //System.out.println("DEBUG: + left=" + leftType + ", right=" + rightType); ///
 
         if (!leftType.equals("int") || !rightType.equals("int")) {
             throw new Exception("Type error: + operator requires int operands");
@@ -423,22 +423,22 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
     @Override
     public String visit(Identifier n, Void argu) throws Exception {
         String name = n.f0.toString();
-        System.out.println("DEBUG: Processing identifier: " + name);
+     //   System.out.println("DEBUG: Processing identifier: " + name);
 
         if (name.equals("int") || name.equals("boolean")) {
-            System.out.println("DEBUG: " + name + " is a built-in type");
+        //    System.out.println("DEBUG: " + name + " is a built-in type");
             return name;
         }
         if (isValidClass(name)) {
-            System.out.println("DEBUG: " + name + " is a valid class");
+           // System.out.println("DEBUG: " + name + " is a valid class");
             return name;
         }
         String type = getVariableType(name);
         if (type == null) {
-            System.out.println("DEBUG: Identifier " + name + " is undefined in current scope.");
+            //System.out.println("DEBUG: Identifier " + name + " is undefined in current scope.");
             throw new Exception("Type error: Undefined variable " + name);
         }
-        System.out.println("DEBUG: " + name + " resolved to type " + type);
+      //  System.out.println("DEBUG: " + name + " resolved to type " + type);
         return type;
     }
 
@@ -501,12 +501,12 @@ public class TypeCheck extends GJDepthFirst<String, Void>{
 
     @Override
     public String visit(Goal n, Void argu) throws Exception {
-        System.out.println("Starting type checking:");
+        //System.out.println("Starting type checking:");
         
         n.f0.accept(this, argu);
         n.f1.accept(this, argu);
         
-        System.out.println("Type checking completed successfully!!");
+        //System.out.println("Type checking completed successfully!!");
         return null;
     }
 }

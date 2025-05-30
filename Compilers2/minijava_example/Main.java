@@ -19,7 +19,7 @@ public class Main {
 
             Goal root = parser.Goal();
 
-            System.err.println("Program parsed successfully.");
+            //System.err.println("Program parsed successfully.");
 
             MyVisitor eval = new MyVisitor();
             root.accept(eval, null);
