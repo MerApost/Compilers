@@ -1,5 +1,0 @@
-reverseTest() {
-  reverse "abc"
-}
-
-reverseTest()

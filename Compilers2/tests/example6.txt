@@ -1,5 +1,0 @@
-my_reverse(my_string) {
-    reverse my_string
-}
-
-reverse my_reverse(if ("dakis" suffix "smaragdakis") "correct" else "error")

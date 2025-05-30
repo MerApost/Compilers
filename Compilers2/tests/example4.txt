@@ -1,8 +1,0 @@
-fun() {
-    "john"
-}
-
-if (fun() = fun())
-    "all good"
-else
-    "something is wrong"
